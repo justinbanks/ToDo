@@ -13,6 +13,12 @@
     <string name="nav_high_priority">High Priority</string>
     <string name="nav_settings">@string/action_settings</string>
 
+    <!-- Strings for priority -->
+    <string name= "priority_high">High</string>
+    <string name= "priority_med">Medium</string>
+    <string name= "priority_low">Low</string>
+    <string name= "priority_none">None</string>
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->

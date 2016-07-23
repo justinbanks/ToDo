@@ -27,7 +27,7 @@ public class ToDoContract {
         public static final String COLUMN_LABEL_ID = "label_id";
 
         // priority assigned to task
-        public static final String COLUMN_PRIORITY = "priority_id";
+        public static final String COLUMN_PRIORITY_ID = "priority_id";
 
         // whether or not a reminder has been added
         public static final String COLUMN_REMINDER_ADDED = "reminder_added";
@@ -37,7 +37,7 @@ public class ToDoContract {
         public static final String COLUMN_IS_DELETED = "is_deleted";
 
         // the parent task of a task, if it has one
-        public static final String COLUMN_PARENT_TASK = "parent_task";
+        public static final String COLUMN_PARENT_TASK_ID = "parent_task";
     }
 
     // This class defines the contents of the priority table
