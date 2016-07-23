@@ -37,6 +37,10 @@
 
     <!-- Strings related to Settings -->
 
+    <!--Strings for extra menu-->
+    <string name="action_sort">Sort</string>
+    <string name="action_search">Search</string>
+
     <!-- Example General settings -->
     <string name="pref_header_general">General</string>
 
