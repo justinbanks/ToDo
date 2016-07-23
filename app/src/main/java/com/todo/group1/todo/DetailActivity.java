@@ -1,6 +1,7 @@
 package com.todo.group1.todo;
 
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
@@ -11,8 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.Button;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -54,14 +54,16 @@ public class DetailActivity extends AppCompatActivity {
 
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
+        private View rootview;
+
         public DetailFragment() {
             setHasOptionsMenu(true);
         }
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-            View rootview = inflater.inflate(R.layout.fragment_detail, container, false);
-            setUpPrioritySpinner(rootview);
+            rootview = inflater.inflate(R.layout.fragment_detail, container, false);
+            setUpTimeSelector();
             return rootview;
         }
 
@@ -72,19 +74,16 @@ public class DetailActivity extends AppCompatActivity {
 
             MenuItem menuItemDelete = menu.findItem(R.id.action_delete);
             MenuItem menuItemAdd = menu.findItem(R.id.action_complete);
-
-
         }
 
-        private void setUpPrioritySpinner(View rootview){
-            Spinner spinner = (Spinner) rootview.findViewById(R.id.spinner_priority);
-            // Create an ArrayAdapter using the string array and a default spinner layout
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-                    R.array.detail_priority_values, android.R.layout.simple_spinner_item);
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            // Apply the adapter to the spinner
-            spinner.setAdapter(adapter);
+        public void setUpTimeSelector() {
+            Button time_button = (Button) rootview.findViewById(R.id.time_selector);
+            time_button.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    DialogFragment newFragment = new TimePickerFragment();
+                    newFragment.show(getFragmentManager(), "timePicker");
+                }
+            });
         }
     }
 }
