@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -62,11 +62,11 @@ public class MainActivity extends AppCompatActivity
                 "6",
                 "7"
         };
-        List<String> taskList = new ArrayList<String>(Arrays.asList(data));
+        List<String> taskList = new ArrayList<>(Arrays.asList(data));
 
         // set up the task list adapter
         mTaskListAdapter =
-                new ArrayAdapter<String>(
+                new ArrayAdapter<>(
                         this, // The current context (this activity)
                         R.layout.list_item_task, // The name of the layout ID.
                         R.id.list_item_task_textview, // The ID of the textview to populate.
@@ -80,9 +80,9 @@ public class MainActivity extends AppCompatActivity
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                String forecast = mTaskListAdapter.getItem(position);
+                String tasklist = mTaskListAdapter.getItem(position);
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, forecast);
+                        .putExtra(Intent.EXTRA_TEXT, tasklist);
                 startActivity(intent);
             }
         });
@@ -106,7 +106,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.completed_tasks) {
-            // Handle the camera action
+            // Handle the completed tasks action
+        } else if (id == R.id.upcoming_tasks) {
+            // Handle the upcoming tasks action
+        } else if (id == R.id.high_priority_tasks) {
+            // Handle the high priority tasks action
         } else if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }

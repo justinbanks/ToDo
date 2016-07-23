@@ -19,6 +19,21 @@
     <string name= "priority_low">Low</string>
     <string name= "priority_none">None</string>
 
+    <!-- Strings for detail activity -->
+    <string name="detail_title">Title</string>
+    <string name="detail_details">Details</string>
+    <string name="detail_priority">Priority</string>
+
+    <string name="action_delete">Delete</string>
+    <string name="action_complete">Complete</string>
+
+    <string-array name="detail_priority_values">
+        <item>@string/priority_none</item>
+        <item>@string/priority_high</item>
+        <item>@string/priority_med</item>
+        <item>@string/priority_low</item>
+    </string-array>
+
     <!-- Strings related to Settings -->
 
     <!-- Example General settings -->
