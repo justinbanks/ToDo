@@ -26,8 +26,7 @@ public class ToDoProvider extends ContentProvider {
     static final int LABELS_WITH_TASK = 301;
 
     static final int PRIORITY = 500;
-    static final int PRIORITIES_WITH_ID = 501;
-
+    static final int PRIORITY_WITH_ID = 501;
 
 
     static UriMatcher buildUriMatcher() {
@@ -46,7 +45,7 @@ public class ToDoProvider extends ContentProvider {
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABELS_WITH_TASK);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
-        matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITIES_WITH_ID);
+        matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY_WITH_ID);
 
         return matcher;
     }
@@ -62,23 +61,23 @@ public class ToDoProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case TASKS:
-                return null;
+                return ToDoContract.TaskEntry.CONTENT_TYPE;
             case TASKS_WITH_PRIORITY:
-                return null;
+                return ToDoContract.TaskEntry.CONTENT_TYPE;
             case TASKS_AFTER_DATE:
-                return null;
+                return ToDoContract.TaskEntry.CONTENT_TYPE;
             case TASKS_MARKED_COMPLETE:
-                return null;
+                return ToDoContract.TaskEntry.CONTENT_TYPE;
             case TASKS_WITH_LABEL:
-                return null;
+                return ToDoContract.TaskEntry.CONTENT_TYPE;
             case LABEL:
-                return null;
+                return ToDoContract.TaskLabel.CONTENT_TYPE;
             case LABELS_WITH_TASK:
-                return null;
+                return ToDoContract.TaskLabel.CONTENT_TYPE;
             case PRIORITY:
-                return null;
-            case PRIORITIES_WITH_ID:
-                return null;
+                return ToDoContract.TaskPriority.CONTENT_TYPE;
+            case PRIORITY_WITH_ID:
+                return ToDoContract.TaskPriority.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri " + uri);
         }
