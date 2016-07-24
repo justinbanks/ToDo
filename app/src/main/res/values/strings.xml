@@ -24,6 +24,9 @@
     <string name="detail_details">Details</string>
     <string name="detail_priority"> Priority</string>
     <string name="detail_select_time">Time</string>
+    <string name="detail_select_date">Date</string>
+    <string name="detail_label">Label</string>
+    <string name="detail_add_reminder">Add Reminder</string>
 
     <string name="action_delete">Delete</string>
     <string name="action_complete">Complete</string>

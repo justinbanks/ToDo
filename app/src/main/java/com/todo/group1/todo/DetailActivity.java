@@ -12,7 +12,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
+
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -64,6 +70,8 @@ public class DetailActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootview = inflater.inflate(R.layout.fragment_detail, container, false);
             setUpTimeSelector();
+            setUpDateSelector();
+            setUpPrioritySpinner();
             return rootview;
         }
 
@@ -78,12 +86,41 @@ public class DetailActivity extends AppCompatActivity {
 
         public void setUpTimeSelector() {
             Button time_button = (Button) rootview.findViewById(R.id.time_selector);
+
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat smp = new SimpleDateFormat("h:mm a", Locale.US);
+            time_button.setText(smp.format(cal.getTime()));
+
             time_button.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v){
                     DialogFragment newFragment = new TimePickerFragment();
                     newFragment.show(getFragmentManager(), "timePicker");
                 }
             });
+        }
+
+        public void setUpDateSelector() {
+            Button date_button = (Button) rootview.findViewById(R.id.date_selector);
+            // set up the date
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat smp = new SimpleDateFormat("E, MMM d", Locale.US);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            date_button.setText(smp.format(cal.getTime()));
+
+            date_button.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v) {
+                    DialogFragment newFragment = new DatePickerFragment();
+                    newFragment.show(getFragmentManager(), "datePicker");
+                }
+            });
+        }
+
+        public void setUpPrioritySpinner(){
+            Spinner spinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                    R.array.detail_priority_values, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+            spinner.setAdapter(adapter);
         }
     }
 }
