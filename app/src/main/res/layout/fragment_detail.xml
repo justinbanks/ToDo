@@ -9,8 +9,6 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:id="@+id/text_input_1"
         android:layout_gravity="start|start">
 
@@ -18,6 +16,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/edit_title"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:inputType="textCapWords|textAutoCorrect"
             android:textSize="32sp"
             android:hint="@string/detail_title"
             />
@@ -57,6 +58,13 @@
                 style="?android:attr/buttonBarButtonStyle"/>
         </TableRow>
 
+        <Button
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:id="@+id/add_reminder_button"
+            android:text="@string/detail_add_reminder">
+        </Button>
+
         <TableRow
             android:layout_height="wrap_content"
             android:layout_width="wrap_content">
@@ -84,13 +92,13 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:id="@+id/text_input_3"
         android:layout_below="@id/table_layout_date">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
             android:drawableStart="@drawable/ic_label"
             android:drawableLeft="@drawable/ic_label"
             android:id="@+id/edit_label"
@@ -102,30 +110,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_input_2"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
         android:layout_below="@id/text_input_3">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textMultiLine"
+            android:inputType="textMultiLine|textCapSentences"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:backgroundTint="@android:color/transparent"
             android:hint="@string/detail_details"
             android:ems="10"
             android:id="@+id/edit_details"/>
     </android.support.design.widget.TextInputLayout>
-
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-    </ListView>
-
-    <Button
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:id="@+id/add_reminder_button"
-        android:text="@string/detail_add_reminder"
-        android:layout_alignParentBottom="true">
-    </Button>
-
 </RelativeLayout>
