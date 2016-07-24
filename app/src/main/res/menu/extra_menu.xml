@@ -2,17 +2,16 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:title="@string/action_sort"
-          android:id="@+id/action_sort"
-          app:showAsAction="always">
-
-    </item>
-
     <item android:title="@string/action_search"
         android:id="@+id/action_search"
+        android:icon="@drawable/ic_search"
+        app:showAsAction="ifRoom">
+    </item>
+
+    <item android:title="@string/action_sort"
+        android:id="@+id/action_sort"
+        android:icon="@android:drawable/ic_menu_sort_by_size"
         app:showAsAction="always">
 
     </item>
-
-
 </menu>
