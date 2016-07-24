@@ -4,13 +4,15 @@
 
     <item android:title="@string/action_sort"
           android:id="@+id/action_sort"
-          app:showAsAction="always">
+          app:showAsAction="always"
+          android:icon="@drawable/ic_swap_vert_black_36dp">
 
     </item>
 
     <item android:title="@string/action_search"
         android:id="@+id/action_search"
-        app:showAsAction="always">
+        app:showAsAction="always"
+        android:icon="@drawable/ic_search_black_36dp">
     </item>
 
 
