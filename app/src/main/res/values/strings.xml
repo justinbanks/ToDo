@@ -22,7 +22,8 @@
     <!-- Strings for detail activity -->
     <string name="detail_title">Title</string>
     <string name="detail_details">Details</string>
-    <string name="detail_priority">Priority</string>
+    <string name="detail_priority"> Priority</string>
+    <string name="detail_select_time">Time</string>
 
     <string name="action_delete">Delete</string>
     <string name="action_complete">Complete</string>
