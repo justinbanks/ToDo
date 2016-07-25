@@ -29,9 +29,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private ArrayAdapter<String> mTaskListAdapter;
-    private List<String> taskList;
     EditText inputSearch;
+    private ArrayAdapter<String> mTaskListAdapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,26 +72,7 @@ public class MainActivity extends AppCompatActivity
                 "7"
         };
         List<String> taskList = new ArrayList<>(Arrays.asList(data));
-        ArrayList<String> list;
 
-        inputSearch = (EditText) findViewById(R.id.inputSearch);
-
-        inputSearch.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                MainActivity.this.mTaskListAdapter.getFilter().filter(charSequence);
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
 
         // set up the task list adapter
         mTaskListAdapter =
@@ -104,6 +85,28 @@ public class MainActivity extends AppCompatActivity
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
+
+        inputSearch = (EditText) findViewById(R.id.inputSearch);
+        listview.setTextFilterEnabled(true);
+
+        inputSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {
+                MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
+            }
+
+            @Override
+            public void onTextChanged(CharSequence arg0, int i, int i1, int i2) {
+                MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
+
+            }
+        });
 
 
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
