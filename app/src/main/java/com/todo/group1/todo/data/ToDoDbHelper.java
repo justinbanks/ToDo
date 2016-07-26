@@ -53,8 +53,8 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
         // Create a table to hold our tasks
         final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
                 TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                TaskEntry.COLUMN_CREATE_DATE + " TEXT NOT NULL," +
-                TaskEntry.COLUMN_DUE_DATE + " TEXT," +
+                TaskEntry.COLUMN_CREATE_DATE + " INTEGER NOT NULL," +
+                TaskEntry.COLUMN_DUE_DATE + " INTEGER," +
                 TaskEntry.COLUMN_TITLE + " TEXT NOT NULL," +
                 TaskEntry.COLUMN_DETAIL + " TEXT," +
                 TaskEntry.COLUMN_IS_COMPLETED + " INTEGER NOT NULL," +
