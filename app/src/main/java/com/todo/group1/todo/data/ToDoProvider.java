@@ -28,6 +28,29 @@ public class ToDoProvider extends ContentProvider {
     static final int PRIORITY = 500;
     static final int PRIORITY_WITH_ID = 501;
 
+    private Cursor getTasksByPriorityId(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
+
+    private Cursor getTasksAfterDate(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
+
+    private Cursor getTasksMarkedComplete(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
+
+    private Cursor getTasksByLabelId(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
+
+    private Cursor getLabelsWithTask(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
+
+    private Cursor getPriorityById(Uri uri, String[] projection, String sortOrder) {
+        return null;
+    }
 
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
@@ -86,7 +109,85 @@ public class ToDoProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        return null;
+        final int match = sUriMatcher.match(uri);
+        Cursor retCursor;
+
+        switch(sUriMatcher.match(uri)) {
+            case TASKS:
+            {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case TASKS_WITH_PRIORITY:
+            {
+                retCursor = getTasksByPriorityId(uri, projection, sortOrder);
+                break;
+            }
+            case TASKS_AFTER_DATE:
+            {
+                retCursor = getTasksAfterDate(uri, projection, sortOrder);
+                break;
+            }
+            case TASKS_WITH_LABEL:
+            {
+                retCursor = getTasksByLabelId(uri, projection, sortOrder);
+                break;
+            }
+            case TASKS_MARKED_COMPLETE:
+            {
+                retCursor = getTasksMarkedComplete(uri, projection, sortOrder);
+                break;
+            }
+            case LABEL:
+            {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskLabel.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case LABELS_WITH_TASK:
+            {
+                retCursor = getLabelsWithTask(uri, projection, sortOrder);
+                break;
+            }
+            case PRIORITY:
+            {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskPriority.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case PRIORITY_WITH_ID:
+            {
+                retCursor = getPriorityById(uri, projection, sortOrder);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        retCursor.setNotificationUri(getContext().getContentResolver(), uri);
+        return retCursor;
+
     }
 
     @Nullable
