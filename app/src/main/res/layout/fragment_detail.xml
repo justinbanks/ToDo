@@ -65,6 +65,11 @@
             android:text="@string/detail_add_reminder">
         </Button>
 
+        <android.support.v4.widget.Space
+            android:layout_width="1dp"
+            android:id="@+id/space_2"
+            android:layout_height="15dp" />
+
         <TableRow
             android:layout_height="wrap_content"
             android:layout_width="wrap_content">
