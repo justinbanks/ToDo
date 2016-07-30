@@ -4,6 +4,14 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.test.InstrumentationRegistry;
+import android.support.test.rule.ActivityTestRule;
+
+import com.todo.group1.todo.MainActivity;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
 
 import java.util.HashSet;
 
@@ -15,11 +23,13 @@ import static org.junit.Assert.assertFalse;
  * Created by Justin Banks on 7/25/16.
  * This file contains test cases pertaining to the ToDoDbHelper and ToDoContract classes.
  */
-
 public class TestDb {
 
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityRule = new ActivityTestRule<>(MainActivity.class);
+
     public static final String LOG_TAG = TestDb.class.getSimpleName();
-    private Context mContext = null;
+    private Context mContext = InstrumentationRegistry.getTargetContext();
 
 
     // Since we want each test to start with a clean slate
@@ -27,12 +37,12 @@ public class TestDb {
         mContext.deleteDatabase(ToDoDbHelper.DATABASE_NAME);
     }
 
-    @org.junit.Before
+    @Before
     public void setUp() {
         deleteTheDatabase();
     }
 
-    @org.junit.Test
+    @Test
     public void testCreateDb() throws Throwable {
         // build a hashset of all table names we wish to look for
         final HashSet<String> tableNameHashSet = new HashSet<>();
@@ -42,7 +52,9 @@ public class TestDb {
 
         mContext.deleteDatabase(ToDoDbHelper.DATABASE_NAME);
 
-        SQLiteDatabase db = new ToDoDbHelper(this.mContext).getWritableDatabase();
+
+        SQLiteDatabase db = new ToDoDbHelper(
+                mContext).getWritableDatabase();
 
         // make sure the database is open
         assertEquals(true, db.isOpen());
@@ -52,7 +64,8 @@ public class TestDb {
         assertTrue("Error: Database not created correctly", c.moveToFirst());
 
         do {
-            tableNameHashSet.remove(c.getString(0));
+            String str = c.getString(0);
+            tableNameHashSet.remove(str);
         } while (c.moveToNext());
 
         // if this fails, it means that the database doesn't contain the desired tables
@@ -93,6 +106,7 @@ public class TestDb {
         c.close();
     }
 
+    @Test
     public void testTaskTable() {
         // get reference to writable database
         ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
@@ -132,6 +146,7 @@ public class TestDb {
         dbHelper.close();
     }
 
+    @Test
     public void testPriorityTable() {
         // make sure we're working with a fresh writable database
         mContext.deleteDatabase(ToDoDbHelper.DATABASE_NAME);
@@ -141,7 +156,7 @@ public class TestDb {
         assertEquals(true, db.isOpen());
 
         // check if table contains the correct columns
-        Cursor c = db.rawQuery("PRAGMA table_info(" + ToDoContract.TaskEntry.TABLE_NAME + ")", null);
+        Cursor c = db.rawQuery("PRAGMA table_info(" + ToDoContract.TaskPriority.TABLE_NAME + ")", null);
 
         assertTrue("Error: This means that we were unable to query the database for table information.",
                 c.moveToFirst());
@@ -156,14 +171,15 @@ public class TestDb {
             priorityColumnHashset.remove(columnName);
         } while(c.moveToNext());
 
-        // if this fails, it means that the database doesn't contain all of the required task
+        // if this fails, it means that the database doesn't contain all of the required priority
         // entry columns
-        assertTrue("Error: The database doesn't contain all of the required task entry columns",
+        assertTrue("Error: The database doesn't contain all of the required priority columns",
                 priorityColumnHashset.isEmpty());
         db.close();
         c.close();
     }
 
+    @Test
     public void testLabelTable() {
         // get reference to writable database
         ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
