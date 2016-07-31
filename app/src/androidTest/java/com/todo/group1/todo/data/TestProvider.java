@@ -3,7 +3,6 @@ package com.todo.group1.todo.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.InstrumentationRegistry;
 
@@ -113,8 +112,6 @@ public class TestProvider {
                 null,   // selectionArgs
                 null    // sortOrder
         );
-
-        String hey = DatabaseUtils.dumpCursorToString(priorityCursor);
 
         TestUtilities.validateCursor("testPriorityByIdQuery", priorityCursor, testValues);
     }
