@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.todo.group1.todo.R;
 import com.todo.group1.todo.data.ToDoContract.TaskEntry;
 import com.todo.group1.todo.data.ToDoContract.TaskLabel;
 import com.todo.group1.todo.data.ToDoContract.TaskPriority;
@@ -32,15 +33,32 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
 
         // Create a table to hold our labels
         final String SQL_CREATE_LABEL_TABLE = "CREATE TABLE " + TaskLabel.TABLE_NAME + " (" +
-                TaskLabel._ID + " INTEGER PRIMARY KEY," +
+                TaskLabel._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 TaskLabel.COLUMN_LABEL + " TEXT NOT NULL " +
                 " );";
 
         // Create a table to hold our priorities
         final String SQL_CREATE_PRIORITY_TABLE = "CREATE TABLE " + TaskPriority.TABLE_NAME + " (" +
-                TaskPriority._ID + " INTEGER PRIMARY KEY," +
+                TaskPriority._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 TaskPriority.COLUMN_PRIORITY + " TEXT NOT NULL " +
                 " );";
+
+        final String SQL_INSERT_PRIORITY_NONE = "INSERT INTO " + TaskPriority.TABLE_NAME +
+                " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
+                + mContext.getString(R.string.priority_none) + "');" ;
+
+        final String SQL_INSERT_PRIORITY_LOW = "INSERT INTO " + TaskPriority.TABLE_NAME +
+                " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
+                + mContext.getString(R.string.priority_low) + "');" ;
+
+        final String SQL_INSERT_PRIORITY_MED = "INSERT INTO " + TaskPriority.TABLE_NAME +
+                " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
+                + mContext.getString(R.string.priority_med) + "');" ;
+
+        final String SQL_INSERT_PRIORITY_HIGH = "INSERT INTO " + TaskPriority.TABLE_NAME +
+                " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
+                + R.string.priority_high + "');" ;
+
 
         // Create a table to hold our tasks
         final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
@@ -66,6 +84,10 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL(SQL_CREATE_LABEL_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_PRIORITY_TABLE);
+        sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_NONE);
+        sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_LOW);
+        sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_MED);
+        sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_HIGH);
         sqLiteDatabase.execSQL(SQL_CREATE_TASK_TABLE);
     }
 

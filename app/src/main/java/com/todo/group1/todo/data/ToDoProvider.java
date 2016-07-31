@@ -16,6 +16,7 @@ public class ToDoProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
     private ToDoDbHelper mOpenHelper;
 
+    // Uri Identification
     static final int TASKS = 100;
     static final int TASKS_WITH_PRIORITY = 101;
     static final int TASKS_AFTER_DATE = 102;
@@ -27,6 +28,8 @@ public class ToDoProvider extends ContentProvider {
 
     static final int PRIORITY = 500;
     static final int PRIORITY_WITH_ID = 501;
+
+    // Functions for more complex queries
 
     private Cursor getTasksByPriorityId(Uri uri, String[] projection, String sortOrder) {
         return null;
@@ -48,10 +51,6 @@ public class ToDoProvider extends ContentProvider {
         return null;
     }
 
-    private Cursor getPriorityById(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -59,16 +58,16 @@ public class ToDoProvider extends ContentProvider {
 
         // Use the addURI function to match each of the types
         matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS);
-        matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS_WITH_PRIORITY);
-        matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS_AFTER_DATE);
-        matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS_MARKED_COMPLETE);
-        matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS_WITH_LABEL);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/priority/#", TASKS_WITH_PRIORITY);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/date/#", TASKS_AFTER_DATE);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/complete", TASKS_MARKED_COMPLETE);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/label/#", TASKS_WITH_LABEL);
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
-        matcher.addURI(authority, ToDoContract.PATH_LABEL, LABELS_WITH_TASK);
+        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/task/#", LABELS_WITH_TASK);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
-        matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY_WITH_ID);
+        matcher.addURI(authority, ToDoContract.PATH_PRIORITY + "/#", PRIORITY_WITH_ID);
 
         return matcher;
     }
@@ -179,7 +178,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case PRIORITY_WITH_ID:
             {
-                retCursor = getPriorityById(uri, projection, sortOrder);
+                selection = "_id = ?";
+                selectionArgs = new String [] {ToDoContract.TaskPriority.getIdFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskPriority.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             default:
