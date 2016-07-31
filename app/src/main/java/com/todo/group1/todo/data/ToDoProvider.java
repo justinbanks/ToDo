@@ -5,12 +5,15 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
  * Created by Justin Banks on 7/24/16.
+ * This class provides the content provider for the To Do application.
  */
 
+@SuppressWarnings("ConstantConditions")
 public class ToDoProvider extends ContentProvider {
 
     private static final UriMatcher sUriMatcher = buildUriMatcher();
@@ -79,7 +82,7 @@ public class ToDoProvider extends ContentProvider {
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case TASKS:
@@ -107,7 +110,7 @@ public class ToDoProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         final int match = sUriMatcher.match(uri);
         Cursor retCursor;
 
@@ -194,6 +197,7 @@ public class ToDoProvider extends ContentProvider {
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+
         retCursor.setNotificationUri(getContext().getContentResolver(), uri);
         return retCursor;
 
@@ -201,22 +205,22 @@ public class ToDoProvider extends ContentProvider {
 
     @Nullable
     @Override
-    public Uri insert(Uri uri, ContentValues contentValues) {
+    public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
         return null;
     }
 
     @Override
-    public int delete(Uri uri, String s, String[] strings) {
+    public int delete(@NonNull Uri uri, String s, String[] strings) {
         return 0;
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
         return 0;
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         return super.bulkInsert(uri, values);
     }
 }
