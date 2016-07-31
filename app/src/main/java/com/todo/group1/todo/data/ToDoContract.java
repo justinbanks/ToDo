@@ -112,6 +112,10 @@ public class ToDoContract {
             return CONTENT_URI.buildUpon().appendPath(priority_id).build();
         }
 
+        public static String getIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
     }
 
     // This class defines the contents of the label table

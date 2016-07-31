@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.test.InstrumentationRegistry;
+
+import com.todo.group1.todo.R;
 
 import java.util.Map;
 import java.util.Set;
@@ -19,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class TestUtilities {
 
     private static long currentTime = System.currentTimeMillis();
+    private static Context mContext = InstrumentationRegistry.getTargetContext();
 
     // This function validates an actual database record against the expected record.
     static void validateCurrentRecord(String error, Cursor valueCursor, ContentValues expectedValues) {
@@ -28,6 +32,7 @@ public class TestUtilities {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
+            String actualValue = valueCursor.getString(idx);
             assertEquals("Value '" + entry.getValue().toString() +
                     "' did not match the expected value '" +
                     expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
@@ -63,6 +68,13 @@ public class TestUtilities {
         return labelValues;
     }
 
+    static ContentValues createPriorityValues() {
+        ContentValues testValues = new ContentValues();
+        testValues.put(ToDoContract.TaskPriority.COLUMN_PRIORITY,
+                mContext.getString(R.string.priority_low));
+        return testValues;
+    }
+
     static long insertTaskEntryValues (Context context) {
         // insert our test records into the database
         ToDoDbHelper dbHelper = new ToDoDbHelper(context);
@@ -85,10 +97,10 @@ public class TestUtilities {
         ContentValues testValues = TestUtilities.createLabelValues();
 
         long labelRowId;
-        labelRowId = db.insert(ToDoContract.TaskEntry.TABLE_NAME, null, testValues);
+        labelRowId = db.insert(ToDoContract.TaskLabel.TABLE_NAME, null, testValues);
 
         // Verify we got a row back.
-        assertTrue("Error: Failure to insert Task Entry Values", labelRowId != -1);
+        assertTrue("Error: Failure to insert Label Values", labelRowId != -1);
 
         return labelRowId;
     }
