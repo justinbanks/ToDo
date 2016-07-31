@@ -69,7 +69,11 @@ public class ToDoContract {
         }
 
         public static Uri buildTaskWithPriority(String id) {
-            return CONTENT_URI.buildUpon().appendPath(id).build();
+            return CONTENT_URI.buildUpon().appendPath("priority").appendPath(id).build();
+        }
+
+        public static String getPriorityIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
         }
 
         public static Uri buildTaskAfterDate(Date date) {

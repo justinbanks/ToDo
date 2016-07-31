@@ -34,10 +34,6 @@ public class ToDoProvider extends ContentProvider {
 
     // Functions for more complex queries
 
-    private Cursor getTasksByPriorityId(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
     private Cursor getTasksAfterDate(Uri uri, String[] projection, String sortOrder) {
         return null;
     }
@@ -130,7 +126,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_WITH_PRIORITY:
             {
-                retCursor = getTasksByPriorityId(uri, projection, sortOrder);
+                selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
+                selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case TASKS_AFTER_DATE:
