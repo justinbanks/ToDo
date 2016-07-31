@@ -45,6 +45,25 @@ public class TestProvider {
     @org.junit.Test
     public void testTasksWithPriorityQuery() {
 
+        // get a writable database
+        ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues testValues = TestUtilities.createTaskEntryValues();
+        long taskRowId = TestUtilities.insertTaskEntryValues(mContext);
+
+        db.close();
+
+        // Test content provider query
+        Cursor taskCursor = mContext.getContentResolver().query(
+                ToDoContract.TaskEntry.buildTaskWithPriority("1"),
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testTasksWithPriorityQuery", taskCursor, testValues);
     }
 
     //  This test uses the database directly to insert and then uses the ContentProvider to
