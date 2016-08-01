@@ -12,7 +12,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import static org.junit.Assert.assertTrue;
-
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by Justin Banks on 7/25/16.
@@ -21,6 +21,40 @@ import static org.junit.Assert.assertTrue;
 public class TestProvider {
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
+
+    // This deletes all records from database tables using the Content Provider
+    public void deleteAllRecordsFromProvider() {
+        mContext.getContentResolver().delete(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null
+        );
+        mContext.getContentResolver().delete(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null
+        );
+
+        Cursor cursor = mContext.getContentResolver().query(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        assertEquals("Error: Records not deleted from Weather table during delete", 0, cursor.getCount());
+        cursor.close();
+
+        cursor = mContext.getContentResolver().query(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        assertEquals("Error: Records not deleted from Location table during delete", 0, cursor.getCount());
+        cursor.close();
+    }
 
     //  This test uses the database directly to insert and then uses the ContentProvider to
     //  read out the data.
@@ -277,5 +311,28 @@ public class TestProvider {
 
         TestUtilities.validateCursor("testInsertReadProvider. Error validating LabelEntry insert",
                 labelCursor, labelValues);
+    }
+
+    public void testDeleteRecords() {
+        testInsertReadProvider();
+
+        // Register a content observer for our location delete.
+        TestUtilities.TestContentObserver taskObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskEntry.CONTENT_URI, true, taskObserver);
+
+        // Register a content observer for our weather delete.
+        TestUtilities.TestContentObserver labelObserver = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskLabel.CONTENT_URI, true, labelObserver);
+
+        deleteAllRecordsFromProvider();
+
+        // Students: If either of these fail, you most-likely are not calling the
+        // getContext().getContentResolver().notifyChange(uri, null); in the ContentProvider
+        // delete.  (only if the insertReadProvider is succeeding)
+        taskObserver.waitForNotificationOrFail();
+        labelObserver.waitForNotificationOrFail();
+
+        mContext.getContentResolver().unregisterContentObserver(taskObserver);
+        mContext.getContentResolver().unregisterContentObserver(labelObserver);
     }
 }

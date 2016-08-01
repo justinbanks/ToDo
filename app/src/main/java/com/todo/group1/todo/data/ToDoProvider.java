@@ -267,17 +267,52 @@ public class ToDoProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(@NonNull Uri uri, String s, String[] strings) {
-        return 0;
-    }
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+        // this makes delete all rows return the number of rows deleted
+        if ( null == selection ) selection = "1";
+        switch (match) {
+            case TASKS:
+                rowsDeleted = db.delete(
+                        ToDoContract.TaskEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case LABEL:
+                rowsDeleted = db.delete(
+                        ToDoContract.TaskLabel.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        // Because a null deletes all rows
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;    }
 
     @Override
-    public int update(@NonNull Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
-    }
+    public int update(
+            @NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated;
 
-    @Override
-    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
-        return super.bulkInsert(uri, values);
+        switch (match) {
+            case TASKS:
+                rowsUpdated = db.update(ToDoContract.TaskEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case LABEL:
+                rowsUpdated = db.update(ToDoContract.TaskLabel.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 }
