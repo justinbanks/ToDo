@@ -6,6 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.test.InstrumentationRegistry;
 
+import java.util.Calendar;
+import java.util.Date;
+
 /**
  * Created by Justin Banks on 7/25/16.
  * This file contains test cases related to the ToDoProvider class.
@@ -70,6 +73,30 @@ public class TestProvider {
     //  read out the data.
     @org.junit.Test
     public void testTasksAfterDateQuery() {
+        // get a writable database
+        ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues testValues = TestUtilities.createTaskEntryValues();
+        long taskRowId = TestUtilities.insertTaskEntryValues(mContext);
+
+        db.close();
+
+        // generate a date
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 1970);
+        Date date = cal.getTime();
+
+        // Test content provider query
+        Cursor taskCursor = mContext.getContentResolver().query(
+                ToDoContract.TaskEntry.buildTaskAfterDate(date),
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testTasksAfterDateQuery", taskCursor, testValues);
 
     }
 
