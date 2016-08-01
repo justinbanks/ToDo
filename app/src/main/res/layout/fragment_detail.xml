@@ -9,6 +9,8 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:id="@+id/text_input_1"
         android:layout_gravity="start|start">
 
@@ -97,6 +99,8 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:id="@+id/text_input_3"
         android:layout_below="@id/table_layout_date">
         <EditText
@@ -114,6 +118,8 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
         android:id="@+id/text_input_2"
         android:layout_below="@id/text_input_3">
         <EditText
@@ -122,7 +128,6 @@
             android:inputType="textMultiLine|textCapSentences"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:backgroundTint="@android:color/transparent"
             android:hint="@string/detail_details"
             android:ems="10"
             android:id="@+id/edit_details"/>
