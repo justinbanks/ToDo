@@ -94,6 +94,10 @@ public class ToDoContract {
         public static Uri buildTasksWithLabel(String label_id) {
             return CONTENT_URI.buildUpon().appendPath("label").appendPath(label_id).build();
         }
+
+        public static String getLabelIdFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
+        }
     }
 
     // This class defines the contents of the priority table
