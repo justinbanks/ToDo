@@ -151,7 +151,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_WITH_LABEL:
             {
-                retCursor = getTasksByLabelId(uri, projection, sortOrder);
+                selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
+                selectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case TASKS_MARKED_COMPLETE:
