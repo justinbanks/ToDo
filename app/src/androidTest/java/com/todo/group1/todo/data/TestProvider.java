@@ -1,13 +1,18 @@
 package com.todo.group1.todo.data;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 
 import java.util.Calendar;
 import java.util.Date;
+
+import static org.junit.Assert.assertTrue;
+
 
 /**
  * Created by Justin Banks on 7/25/16.
@@ -223,5 +228,54 @@ public class TestProvider {
         );
 
         TestUtilities.validateCursor("testPriorityByIdQuery", priorityCursor, testValues);
+    }
+
+    // This tests the insert functionality for our content provider
+    @org.junit.Test
+    public void testInsertReadProvider() {
+        // Test the task insertion
+        ContentValues testValues = TestUtilities.createTaskEntryValues();
+
+        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskEntry.CONTENT_URI,
+                true,
+                tco);
+        Uri taskUri = mContext.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        // verify content observer was called
+        tco.waitForNotificationOrFail();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        long taskRowId = ContentUris.parseId(taskUri);
+
+        // verify a row was returned
+        assertTrue(taskRowId != -1);
+
+        // Verify that data was inserted by pulling it out and looking at it
+        Cursor cursor = mContext.getContentResolver().query(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating TaskEntry insert",
+                cursor, testValues);
+
+        // Test the label insertion
+        ContentValues labelValues = TestUtilities.createLabelValues();
+        tco = TestUtilities.getTestContentObserver();
+        mContext.getContentResolver().unregisterContentObserver(tco);
+
+        Cursor labelCursor = mContext.getContentResolver().query(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testInsertReadProvider. Error validating LabelEntry insert",
+                labelCursor, labelValues);
     }
 }
