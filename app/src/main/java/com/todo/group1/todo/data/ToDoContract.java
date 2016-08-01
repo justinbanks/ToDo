@@ -77,8 +77,14 @@ public class ToDoContract {
         }
 
         public static Uri buildTaskAfterDate(Date date) {
-            String str_date = date.toString();
-            return CONTENT_URI.buildUpon().appendPath(str_date).build();
+            // date format needs to be in milliseconds since epoch
+            long milliseconds = date.getTime();
+            String str_date = String.valueOf(milliseconds);
+            return CONTENT_URI.buildUpon().appendPath("date").appendPath(str_date).build();
+        }
+
+        public static String getDateFromUri(Uri uri) {
+            return uri.getPathSegments().get(2);
         }
 
         public static Uri buildTaskMarkedComplete() {
@@ -86,7 +92,7 @@ public class ToDoContract {
         }
 
         public static Uri buildTasksWithLabel(String label_id) {
-            return CONTENT_URI.buildUpon().appendPath(label_id).build();
+            return CONTENT_URI.buildUpon().appendPath("label").appendPath(label_id).build();
         }
     }
 

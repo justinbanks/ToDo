@@ -33,11 +33,6 @@ public class ToDoProvider extends ContentProvider {
     static final int PRIORITY_WITH_ID = 501;
 
     // Functions for more complex queries
-
-    private Cursor getTasksAfterDate(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
     private Cursor getTasksMarkedComplete(Uri uri, String[] projection, String sortOrder) {
         return null;
     }
@@ -63,7 +58,7 @@ public class ToDoProvider extends ContentProvider {
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/label/#", TASKS_WITH_LABEL);
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
-        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/task/#", LABELS_WITH_TASK);
+        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/#", LABELS_WITH_TASK);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY + "/#", PRIORITY_WITH_ID);
@@ -141,7 +136,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_AFTER_DATE:
             {
-                retCursor = getTasksAfterDate(uri, projection, sortOrder);
+                selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
+                selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case TASKS_WITH_LABEL:
