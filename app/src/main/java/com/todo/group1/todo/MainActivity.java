@@ -161,4 +161,10 @@ public class MainActivity extends AppCompatActivity
         inflater.inflate(R.menu.extra_menu, menu);
         return super.onCreateOptionsMenu(menu);
     }
+
+    @Override
+    public boolean onMenuItemSelected(MenuItem item){
+
+        switch (item.getItemId())
+    }
 }
