@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -231,10 +232,38 @@ public class ToDoProvider extends ContentProvider {
 
     }
 
+    // insert a record into the database
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
-        return null;
+        // get a writable database
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        Uri returnUri;
+
+        switch (match) {
+            case TASKS: {
+                long _id = db.insert(ToDoContract.TaskEntry.TABLE_NAME, null, contentValues);
+                if (_id > 0)
+                    returnUri = ToDoContract.TaskEntry.buildTaskUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case LABEL: {
+                long _id = db.insert(ToDoContract.TaskLabel.TABLE_NAME, null, contentValues);
+                if (_id > 0)
+                    returnUri = ToDoContract.TaskLabel.buildLabelUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            default:
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override
