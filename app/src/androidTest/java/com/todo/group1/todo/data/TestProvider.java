@@ -129,6 +129,32 @@ public class TestProvider {
     //  This test uses the database directly to insert and then uses the ContentProvider to
     //  read out the data.
     @org.junit.Test
+    public void testTasksMarkedComplete() {
+        // get a writable database
+        ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues testValues = TestUtilities.createTaskEntryValues();
+        long taskRowId = TestUtilities.insertTaskEntryValues(mContext);
+
+        db.close();
+
+        // Test content provider query
+        Cursor taskCursor = mContext.getContentResolver().query(
+                ToDoContract.TaskEntry.buildTaskMarkedComplete(),
+                null,
+                null,
+                null,
+                null
+        );
+
+        TestUtilities.validateCursor("testTasksAfterDateQuery", taskCursor, testValues);
+
+    }
+
+    //  This test uses the database directly to insert and then uses the ContentProvider to
+    //  read out the data.
+    @org.junit.Test
     public void testBasicLabelQuery() {
         // get a writable database
         ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
