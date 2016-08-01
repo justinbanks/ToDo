@@ -32,19 +32,6 @@ public class ToDoProvider extends ContentProvider {
     static final int PRIORITY = 500;
     static final int PRIORITY_WITH_ID = 501;
 
-    // Functions for more complex queries
-    private Cursor getTasksMarkedComplete(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
-    private Cursor getTasksByLabelId(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
-    private Cursor getLabelsWithTask(Uri uri, String[] projection, String sortOrder) {
-        return null;
-    }
-
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -166,7 +153,7 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_MARKED_COMPLETE:
             {
-                retCursor = getTasksMarkedComplete(uri, projection, sortOrder);
+                retCursor = null;
                 break;
             }
             case LABEL:
@@ -184,7 +171,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case LABELS_WITH_TASK:
             {
-                retCursor = getLabelsWithTask(uri, projection, sortOrder);
+                selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
+                selectionArgs = new String[] {ToDoContract.TaskLabel.getLabelFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                    ToDoContract.TaskEntry.TABLE_NAME,
+                    projection,
+                    selection,
+                    selectionArgs,
+                    null,
+                    null,
+                    sortOrder
+            );
                 break;
             }
             case PRIORITY:

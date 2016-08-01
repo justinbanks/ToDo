@@ -157,5 +157,9 @@ public class ToDoContract {
         public static Uri buildLabelsWithTask(String task_id) {
             return CONTENT_URI.buildUpon().appendPath(task_id).build();
         }
+
+        public static String getLabelFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
     }
 }
