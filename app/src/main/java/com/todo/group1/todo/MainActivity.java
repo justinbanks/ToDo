@@ -85,6 +85,7 @@ public class MainActivity extends AppCompatActivity
                 "6",
                 "7"
         };
+
         List<String> taskList = new ArrayList<>(Arrays.asList(data));
 
 
@@ -143,7 +144,6 @@ public class MainActivity extends AppCompatActivity
         });
 
     }
-
 
     @Override
     public void onBackPressed() {
