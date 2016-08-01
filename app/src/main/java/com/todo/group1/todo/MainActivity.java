@@ -29,7 +29,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    EditText inputSearch;
+    EditText input;
     private ArrayAdapter<String> mTaskListAdapter;
 
 
@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -86,10 +87,10 @@ public class MainActivity extends AppCompatActivity
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
 
-        inputSearch = (EditText) findViewById(R.id.inputSearch);
+        input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
 
-        inputSearch.addTextChangedListener(new TextWatcher() {
+        input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {
                 MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
@@ -162,5 +163,8 @@ public class MainActivity extends AppCompatActivity
         return super.onCreateOptionsMenu(menu);
     }
 
-
+    public void hideSearch(MenuItem item)
+    {
+        input.setVisibility(View.VISIBLE);
+    }
 }

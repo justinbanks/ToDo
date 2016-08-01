@@ -12,7 +12,8 @@
     <item android:title="@string/action_search"
         android:id="@+id/action_search"
         app:showAsAction="always"
-        android:icon="@drawable/ic_search_white_36dp">
+        android:icon="@drawable/ic_search_white_36dp"
+        android:onClick="hideSearch">
     </item>
 
 
