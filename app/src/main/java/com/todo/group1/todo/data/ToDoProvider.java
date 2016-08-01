@@ -153,7 +153,17 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_MARKED_COMPLETE:
             {
-                retCursor = null;
+                // 1 means the task is marked complete
+                selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case LABEL:

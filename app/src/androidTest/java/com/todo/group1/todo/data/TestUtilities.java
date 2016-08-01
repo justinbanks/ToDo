@@ -51,7 +51,7 @@ public class TestUtilities {
         taskValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
