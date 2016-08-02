@@ -2,8 +2,10 @@ package com.todo.group1.todo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -26,15 +28,16 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import com.todo.group1.todo.data.ToDoContract;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     EditText inputSearch;
-    private ArrayAdapter<String> mTaskListAdapter;
+    private ArrayAdapter<ToDoItem> mTaskListAdapter;
 
 
     @Override
@@ -71,22 +74,45 @@ public class MainActivity extends AppCompatActivity
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
         }
 
-        // Create some dummy data for the ListView.  Here's a sample tasklist
-        String[] data = {
-                "Buy a new tie",
-                "Walk John's dog",
-                "Find a good eggplant recipe",
-                "Get a job",
-                "1",
-                "2",
-                "3",
-                "4",
-                "5",
-                "6",
-                "7"
-        };
+        // generating some test data
+        long currentTime = System.currentTimeMillis();
+        ContentValues testValues = new ContentValues();
+        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
 
-        List<String> taskList = new ArrayList<>(Arrays.asList(data));
+        this.getContentResolver().delete(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null
+        );
+
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        // Test content provider query
+        Cursor taskCursor = this.getContentResolver().query(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+
+        List<ToDoItem> taskList = new ArrayList<>();
+        ToDoItem item;
+
+        while (taskCursor.moveToNext()) {
+            item = new ToDoItem(taskCursor.getString(taskCursor.getColumnIndex("title")));
+            taskList.add(item);
+        }
+        taskCursor.close();
 
 
         // set up the task list adapter
@@ -127,9 +153,11 @@ public class MainActivity extends AppCompatActivity
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                String tasklist = mTaskListAdapter.getItem(position);
+                ToDoItem tasklist = mTaskListAdapter.getItem(position);
+//                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
+//                        .putExtra(Intent.EXTRA_TEXT, tasklist);
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class)
-                        .putExtra(Intent.EXTRA_TEXT, tasklist);
+                        .putExtra("ToDoItem", tasklist);
                 startActivity(intent);
             }
         });

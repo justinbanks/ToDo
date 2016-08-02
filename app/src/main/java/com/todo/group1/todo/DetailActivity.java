@@ -1,5 +1,6 @@
 package com.todo.group1.todo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -14,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.text.SimpleDateFormat;
@@ -61,6 +63,7 @@ public class DetailActivity extends AppCompatActivity {
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
 
         private View rootview;
+        private ToDoItem item;
 
         public DetailFragment() {
             setHasOptionsMenu(true);
@@ -72,6 +75,14 @@ public class DetailActivity extends AppCompatActivity {
             setUpTimeSelector();
             setUpDateSelector();
             setUpPrioritySpinner();
+
+            // If the view was called with an intent, we want to populate the fields
+            Intent intent = getActivity().getIntent();
+            if (intent != null && intent.hasExtra("ToDoItem")) {
+                item = (ToDoItem) intent.getSerializableExtra("ToDoItem");
+                populateFields(item);
+            }
+
             return rootview;
         }
 
@@ -121,6 +132,11 @@ public class DetailActivity extends AppCompatActivity {
                     R.array.detail_priority_values, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
             spinner.setAdapter(adapter);
+        }
+
+        private void populateFields(ToDoItem item) {
+            EditText editTitle = (EditText) rootview.findViewById(R.id.edit_title);
+            editTitle.setText(item.todo_title);
         }
     }
 }
