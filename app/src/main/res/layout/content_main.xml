@@ -25,5 +25,6 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:hint="@string/action_search"
-        android:inputType="text"/>
+        android:inputType="text"
+        android:visibility="gone"/>
 </RelativeLayout>
