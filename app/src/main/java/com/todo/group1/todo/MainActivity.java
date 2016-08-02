@@ -162,6 +162,14 @@ public class MainActivity extends AppCompatActivity
 
     public void hideSearch(MenuItem item)
     {
-        input.setVisibility(View.VISIBLE);
+        if(input.getVisibility() == View.GONE)
+        {
+            input.setVisibility(View.VISIBLE);
+        }
+
+        else if(input.getVisibility() == View.VISIBLE)
+        {
+            input.setVisibility(View.GONE);
+        }
     }
 }
