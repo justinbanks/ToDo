@@ -120,7 +120,11 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupActionBar();
+
+        // Display the fragment as the main content.
+        getFragmentManager().beginTransaction()
+                .replace(android.R.id.content, new GeneralPreferenceFragment())
+                .commit();
     }
 
     /**
@@ -157,11 +161,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * {@inheritDoc}
      */
-    @Override
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
-    }
+
+    //@Override
+    //@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    //public void onBuildHeaders(List<Header> target) {
+        //loadHeadersFromResource(R.xml.pref_headers, target);
+    //}
 
     /**
      * This method stops fragment injection in malicious applications.
@@ -184,14 +189,14 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_general);
-            setHasOptionsMenu(true);
+            //setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("example_text"));
-            bindPreferenceSummaryToValue(findPreference("example_list"));
+            //bindPreferenceSummaryToValue(findPreference("example_text"));
+            //bindPreferenceSummaryToValue(findPreference("example_list"));
         }
 
         @Override
