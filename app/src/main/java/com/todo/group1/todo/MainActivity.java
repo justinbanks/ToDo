@@ -1,9 +1,16 @@
 package com.todo.group1.todo;
 
+import android.Manifest;
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -28,9 +36,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    EditText inputSearch;
+    private ArrayAdapter<ToDoItem> mTaskListAdapter;
     EditText input;
-    private ArrayAdapter<String> mTaskListAdapter;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +115,6 @@ public class MainActivity extends AppCompatActivity
         }
         taskCursor.close();
 
-
         // set up the task list adapter
         mTaskListAdapter =
                 new ArrayAdapter<>(
@@ -147,23 +154,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 ToDoItem tasklist = mTaskListAdapter.getItem(position);
-//                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
-//                        .putExtra(Intent.EXTRA_TEXT, tasklist);
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class)
                         .putExtra("ToDoItem", tasklist);
                 startActivity(intent);
             }
         });
-
-        inputSearch.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    hideKeyboard(v);
-                }
-            }
-        });
-
     }
 
     @Override
@@ -206,20 +201,14 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void hideKeyboard(View view) {
-        InputMethodManager inputMethodManager =(InputMethodManager)getSystemService(Activity.INPUT_METHOD_SERVICE);
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    public void hideSearch(MenuItem item)
-    {
+    public void hideSearch(MenuItem item) {
         if(input.getVisibility() == View.GONE)
-        {
             input.setVisibility(View.VISIBLE);
-        }
-
         else if(input.getVisibility() == View.VISIBLE)
-        {
             input.setVisibility(View.GONE);
-        }
     }
 }
