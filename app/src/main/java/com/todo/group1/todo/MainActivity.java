@@ -169,6 +169,15 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
+
+        input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                        @Override
+                       public void onFocusChange(View v, boolean hasFocus) {
+                                if (!hasFocus) {
+                                        hideKeyboard(v);
+                                    }
+                            }
+                    });
     }
 
     @Override
