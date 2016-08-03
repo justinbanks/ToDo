@@ -91,10 +91,14 @@
                 android:id="@+id/priority_spinner"
                 android:layout_gravity="end">
             </Spinner>
-
         </TableRow>
+    </TableLayout>
 
-</TableLayout>
+    <android.support.v4.widget.Space
+        android:layout_width="1dp"
+        android:id="@+id/space_3"
+        android:layout_height="15dp"
+        android:layout_below="@id/table_layout_date"/>
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -102,14 +106,12 @@
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:id="@+id/text_input_3"
-        android:layout_below="@id/table_layout_date">
+        android:layout_below="@id/space_3">
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
-            android:drawableStart="@drawable/ic_label"
-            android:drawableLeft="@drawable/ic_label"
             android:id="@+id/edit_label"
             android:hint="@string/detail_label"
             />

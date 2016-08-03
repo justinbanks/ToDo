@@ -158,6 +158,12 @@ public class ToDoContract {
             return CONTENT_URI.buildUpon().appendPath(task_id).build();
         }
 
+        public static Uri buildLabelWithId(String label_id) {
+            return CONTENT_URI.buildUpon().appendPath("id").appendPath(label_id).build();
+        }
+
+        public static String getIdFromUri(Uri uri) { return uri.getPathSegments().get(2); }
+
         public static String getLabelFromUri(Uri uri) {
             return uri.getPathSegments().get(1);
         }

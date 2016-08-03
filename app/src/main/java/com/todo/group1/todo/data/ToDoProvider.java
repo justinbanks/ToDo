@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -29,9 +30,39 @@ public class ToDoProvider extends ContentProvider {
 
     static final int LABEL = 300;
     static final int LABELS_WITH_TASK = 301;
+    static final int LABEL_WITH_ID = 302;
 
     static final int PRIORITY = 500;
     static final int PRIORITY_WITH_ID = 501;
+
+    private static final SQLiteQueryBuilder sTasksWithPriorityAndLabels = new SQLiteQueryBuilder();
+
+    static {
+        sTasksWithPriorityAndLabels.setTables(
+                ToDoContract.TaskEntry.TABLE_NAME + " INNER JOIN " +
+                        ToDoContract.TaskPriority.TABLE_NAME +
+                        " ON " + ToDoContract.TaskEntry.TABLE_NAME +
+                        "." + ToDoContract.TaskEntry.COLUMN_PRIORITY_ID +
+                        " = " + ToDoContract.TaskPriority.TABLE_NAME +
+                        "." + ToDoContract.TaskPriority._ID +
+                        " INNER JOIN " + ToDoContract.TaskLabel.TABLE_NAME +
+                        " ON " + ToDoContract.TaskEntry.TABLE_NAME +
+                        "." + ToDoContract.TaskEntry.COLUMN_LABEL_ID +
+                        " = " + ToDoContract.TaskLabel.TABLE_NAME +
+                        "." + ToDoContract.TaskLabel._ID
+        );
+    }
+
+    private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
 
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
@@ -47,6 +78,7 @@ public class ToDoProvider extends ContentProvider {
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
         matcher.addURI(authority, ToDoContract.PATH_LABEL + "/#", LABELS_WITH_TASK);
+        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/id/#", LABEL_WITH_ID);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY + "/#", PRIORITY_WITH_ID);
@@ -78,6 +110,8 @@ public class ToDoProvider extends ContentProvider {
                 return ToDoContract.TaskLabel.CONTENT_TYPE;
             case LABELS_WITH_TASK:
                 return ToDoContract.TaskLabel.CONTENT_TYPE;
+            case LABEL_WITH_ID:
+                return ToDoContract.TaskLabel.CONTENT_ITEM_TYPE;
             case PRIORITY:
                 return ToDoContract.TaskPriority.CONTENT_TYPE;
             case PRIORITY_WITH_ID:
@@ -96,15 +130,15 @@ public class ToDoProvider extends ContentProvider {
         switch(sUriMatcher.match(uri)) {
             case TASKS:
             {
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ToDoContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+//                retCursor = mOpenHelper.getReadableDatabase().query(
+//                        ToDoContract.TaskEntry.TABLE_NAME,
+//                        projection,
+//                        selection,
+//                        selectionArgs,
+//                        null,
+//                        null,
+//                        sortOrder
+                retCursor = getTasks(uri, projection, sortOrder);
                 break;
             }
             case TASKS_WITH_PRIORITY:
@@ -182,6 +216,7 @@ public class ToDoProvider extends ContentProvider {
             }
             case LABELS_WITH_TASK:
             {
+                // TODO fix this monstrosity (it doesn't do what you want)
                 selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
                 selectionArgs = new String[] {ToDoContract.TaskLabel.getLabelFromUri(uri)};
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -193,6 +228,21 @@ public class ToDoProvider extends ContentProvider {
                     null,
                     sortOrder
             );
+                break;
+            }
+            case LABEL_WITH_ID:
+            {
+                selection = "_id = ?";
+                selectionArgs = new String [] {ToDoContract.TaskLabel.getIdFromUri(uri)};
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskLabel.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
             }
             case PRIORITY:

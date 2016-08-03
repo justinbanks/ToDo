@@ -148,7 +148,11 @@ public class DetailActivity extends AppCompatActivity {
                 editLabel.setText(item.label);
             if (!item.details.equals(""))
                 editDetails.setText(item.details);
-
+            if (!item.priority.equals("")) {
+                ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
+                        R.array.detail_priority_values, android.R.layout.simple_spinner_item);
+                prioritySpinner.setSelection(adapter.getPosition(item.priority));
+            }
         }
     }
 }

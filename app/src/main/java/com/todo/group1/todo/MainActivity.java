@@ -36,7 +36,6 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    EditText inputSearch;
     private ArrayAdapter<ToDoItem> mTaskListAdapter;
     EditText input;
 
@@ -75,6 +74,35 @@ public class MainActivity extends AppCompatActivity
                     MY_PERMISSIONS_REQUEST_READ_CONTACTS);
         }
 
+        this.getContentResolver().delete(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null
+        );
+
+        this.getContentResolver().delete(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null
+        );
+
+        ContentValues labelValues = new ContentValues();
+        labelValues.put(ToDoContract.TaskLabel.COLUMN_LABEL, "YEEEESSS");
+        this.getContentResolver().insert(ToDoContract.TaskLabel.CONTENT_URI, labelValues);
+
+        Cursor labelCursor = this.getContentResolver().query(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        int validLabelId = -1;
+        while (labelCursor.moveToNext()) {
+            validLabelId = labelCursor.getInt(
+                    labelCursor.getColumnIndex(ToDoContract.TaskLabel._ID));
+        }
+
         // generating some test data
         long currentTime = System.currentTimeMillis();
         ContentValues testValues = new ContentValues();
@@ -83,23 +111,17 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
         testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
         testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
         testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
         testValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
-
-        this.getContentResolver().delete(
-                ToDoContract.TaskEntry.CONTENT_URI,
-                null,
-                null
-        );
 
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
 
         // Set up our tasklist
         Cursor taskCursor = getAllTasks();
-        List<ToDoItem> taskList = retreiveTasksFromCursor(taskCursor);
+        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
         taskCursor.close();
 
 
@@ -212,26 +234,27 @@ public class MainActivity extends AppCompatActivity
         return taskCursor;
     }
 
-    public List<ToDoItem> retreiveTasksFromCursor(Cursor taskCursor) {
+    public List<ToDoItem> retrieveTasksFromCursor(Cursor taskCursor) {
         List<ToDoItem> taskList = new ArrayList<>();
         while (taskCursor.moveToNext()) {
             String title = taskCursor.getString(
                     taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE));
             String details = taskCursor.getString(taskCursor.getColumnIndex(
                     ToDoContract.TaskEntry.COLUMN_DETAIL));
-            int labelId = taskCursor.getInt(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_LABEL_ID));
+            String label = taskCursor.getString(
+                    taskCursor.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
             long date = taskCursor.getLong(
                     taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
-            int priorityId = taskCursor.getInt(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID));
+            String priority = taskCursor.getString(
+                    taskCursor.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
             int complete = taskCursor.getInt(
                     taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
             boolean is_complete = (complete != 0);
             int delete = taskCursor.getInt(
                     taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
             boolean is_deleted = (delete != 0);
-            ToDoItem item = new ToDoItem(title, date, priorityId, details, labelId,
+
+            ToDoItem item = new ToDoItem(title, date, priority, details, label,
                     is_complete, is_deleted);
             taskList.add(item);
         }

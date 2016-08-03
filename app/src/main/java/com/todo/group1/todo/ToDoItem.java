@@ -17,19 +17,17 @@ public class ToDoItem implements Serializable{
     public int due_year = 1970;
     public int due_hour = 12;
     public int due_minute = 0;
-    public int labelId = 0;
-    public int priorityId = 0;
     public String priority = "None";
     public String details = "";
     public String label = "";
     public boolean is_complete = false;
     public boolean is_deleted = false;
 
-    public ToDoItem(String todo_title, long date_in_ms, int priorityId, String details, int labelId,
+    public ToDoItem(String todo_title, long date_in_ms, String priority, String details, String label,
                     boolean is_complete, boolean is_deleted){
         this.todo_title = todo_title;
         this.date_in_ms = date_in_ms;
-        this.priorityId = priorityId;
+        this.priority = priority;
         this.details = details;
         this.label = label;
         this.is_complete = is_complete;
@@ -43,14 +41,6 @@ public class ToDoItem implements Serializable{
     @Override
     public String toString() {
         return todo_title;
-    }
-
-    public String getPriorityString(){
-        return "";
-    }
-
-    public String getLabelString() {
-        return "";
     }
 
 }

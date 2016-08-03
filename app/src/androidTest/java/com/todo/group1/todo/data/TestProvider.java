@@ -244,6 +244,29 @@ public class TestProvider {
     //  This test uses the database directly to insert and then uses the ContentProvider to
     //  read out the data.
     @org.junit.Test
+    public void testLabelByIdQuery() {
+        // get a writable database
+        ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues testValues = TestUtilities.createLabelValues();
+        db.close();
+
+        // Test content provider query
+        Cursor priorityCursor = mContext.getContentResolver().query(
+                ToDoContract.TaskLabel.buildLabelWithId("1"), // uri
+                null,   // projection
+                null,   // selection
+                null,   // selectionArgs
+                null    // sortOrder
+        );
+
+        TestUtilities.validateCursor("testLabelByIdQuery", priorityCursor, testValues);
+    }
+
+    //  This test uses the database directly to insert and then uses the ContentProvider to
+    //  read out the data.
+    @org.junit.Test
     public void testPriorityByIdQuery() {
         // get a writable database
         ToDoDbHelper dbHelper = new ToDoDbHelper(mContext);
@@ -313,6 +336,7 @@ public class TestProvider {
                 labelCursor, labelValues);
     }
 
+    @org.junit.Test
     public void testDeleteRecords() {
         testInsertReadProvider();
 
