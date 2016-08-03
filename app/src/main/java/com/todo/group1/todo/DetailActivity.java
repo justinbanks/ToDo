@@ -136,7 +136,19 @@ public class DetailActivity extends AppCompatActivity {
 
         private void populateFields(ToDoItem item) {
             EditText editTitle = (EditText) rootview.findViewById(R.id.edit_title);
-            editTitle.setText(item.todo_title);
+            EditText editLabel = (EditText) rootview.findViewById(R.id.edit_label);
+            EditText editDetails = (EditText) rootview.findViewById(R.id.edit_details);
+            Button dateButton = (Button) rootview.findViewById(R.id.date_selector);
+            Button timeButton = (Button) rootview.findViewById(R.id.time_selector);
+            Spinner prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
+
+            if (!item.todo_title.equals(""))
+                editTitle.setText(item.todo_title);
+            if (!item.label.equals(""))
+                editLabel.setText(item.label);
+            if (!item.details.equals(""))
+                editDetails.setText(item.details);
+
         }
     }
 }

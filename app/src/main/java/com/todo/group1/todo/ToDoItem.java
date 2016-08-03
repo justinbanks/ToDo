@@ -9,16 +9,27 @@ import java.io.Serializable;
 
 // Serializable is implemented here in order to pass the class between activities
 public class ToDoItem implements Serializable{
-    public ToDoItem(String todo_title, int due_day, int due_month, int due_year, int due_hour,
-                    int due_minute, String priority, String details, String label,
+
+    public String todo_title = "";
+    public long date_in_ms = 0;
+    public int due_day = 1;
+    public int due_month = 1;
+    public int due_year = 1970;
+    public int due_hour = 12;
+    public int due_minute = 0;
+    public int labelId = 0;
+    public int priorityId = 0;
+    public String priority = "None";
+    public String details = "";
+    public String label = "";
+    public boolean is_complete = false;
+    public boolean is_deleted = false;
+
+    public ToDoItem(String todo_title, long date_in_ms, int priorityId, String details, int labelId,
                     boolean is_complete, boolean is_deleted){
         this.todo_title = todo_title;
-        this.due_day = due_day;
-        this.due_month = due_month;
-        this.due_year = due_year;
-        this.due_hour = due_hour;
-        this.due_minute = due_minute;
-        this.priority = priority;
+        this.date_in_ms = date_in_ms;
+        this.priorityId = priorityId;
         this.details = details;
         this.label = label;
         this.is_complete = is_complete;
@@ -34,15 +45,12 @@ public class ToDoItem implements Serializable{
         return todo_title;
     }
 
-    public String todo_title;
-    public int due_day;
-    public int due_month;
-    public int due_year;
-    public int due_hour;
-    public int due_minute;
-    public String priority;
-    public String details;
-    public String label;
-    public boolean is_complete;
-    public boolean is_deleted;
+    public String getPriorityString(){
+        return "";
+    }
+
+    public String getLabelString() {
+        return "";
+    }
+
 }

@@ -97,23 +97,11 @@ public class MainActivity extends AppCompatActivity
 
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
 
-        // Test content provider query
-        Cursor taskCursor = this.getContentResolver().query(
-                ToDoContract.TaskEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-
-        List<ToDoItem> taskList = new ArrayList<>();
-        ToDoItem item;
-
-        while (taskCursor.moveToNext()) {
-            item = new ToDoItem(taskCursor.getString(taskCursor.getColumnIndex("title")));
-            taskList.add(item);
-        }
+        // Set up our tasklist
+        Cursor taskCursor = getAllTasks();
+        List<ToDoItem> taskList = retreiveTasksFromCursor(taskCursor);
         taskCursor.close();
+
 
         // set up the task list adapter
         mTaskListAdapter =
@@ -210,5 +198,43 @@ public class MainActivity extends AppCompatActivity
             input.setVisibility(View.VISIBLE);
         else if(input.getVisibility() == View.VISIBLE)
             input.setVisibility(View.GONE);
+    }
+
+    public Cursor getAllTasks() {
+        // Test content provider query
+        Cursor taskCursor = this.getContentResolver().query(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        return taskCursor;
+    }
+
+    public List<ToDoItem> retreiveTasksFromCursor(Cursor taskCursor) {
+        List<ToDoItem> taskList = new ArrayList<>();
+        while (taskCursor.moveToNext()) {
+            String title = taskCursor.getString(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE));
+            String details = taskCursor.getString(taskCursor.getColumnIndex(
+                    ToDoContract.TaskEntry.COLUMN_DETAIL));
+            int labelId = taskCursor.getInt(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_LABEL_ID));
+            long date = taskCursor.getLong(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
+            int priorityId = taskCursor.getInt(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID));
+            int complete = taskCursor.getInt(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
+            boolean is_complete = (complete != 0);
+            int delete = taskCursor.getInt(
+                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
+            boolean is_deleted = (delete != 0);
+            ToDoItem item = new ToDoItem(title, date, priorityId, details, labelId,
+                    is_complete, is_deleted);
+            taskList.add(item);
+        }
+        return taskList;
     }
 }
