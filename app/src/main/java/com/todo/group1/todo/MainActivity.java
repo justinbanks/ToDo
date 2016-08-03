@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // generating some test data
-        long currentTime = System.currentTimeMillis();
+        long currentTime = System.currentTimeMillis() + 1000000;
         ContentValues testValues = new ContentValues();
         testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
         testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);

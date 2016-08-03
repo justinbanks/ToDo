@@ -134,6 +134,7 @@ public class DetailActivity extends AppCompatActivity {
             spinner.setAdapter(adapter);
         }
 
+        // This function populates the fields of a the activity if an intent was passed
         private void populateFields(ToDoItem item) {
             EditText editTitle = (EditText) rootview.findViewById(R.id.edit_title);
             EditText editLabel = (EditText) rootview.findViewById(R.id.edit_label);
@@ -142,8 +143,8 @@ public class DetailActivity extends AppCompatActivity {
             Button timeButton = (Button) rootview.findViewById(R.id.time_selector);
             Spinner prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
 
-            if (!item.todo_title.equals(""))
-                editTitle.setText(item.todo_title);
+            if (!item.toDoTitle.equals(""))
+                editTitle.setText(item.toDoTitle);
             if (!item.label.equals(""))
                 editLabel.setText(item.label);
             if (!item.details.equals(""))
@@ -152,6 +153,16 @@ public class DetailActivity extends AppCompatActivity {
                 ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                         R.array.detail_priority_values, android.R.layout.simple_spinner_item);
                 prioritySpinner.setSelection(adapter.getPosition(item.priority));
+            }
+            if (item.dateInMs != 0) {
+                item.configureTime();
+                SimpleDateFormat smp = new SimpleDateFormat("E, MMM d", Locale.US);
+                dateButton.setText(smp.format(item.calTime.getTime()));
+
+                smp = new SimpleDateFormat("h:mm a", Locale.US);
+                timeButton.setText(smp.format(item.calTime.getTime()));
+
+
             }
         }
     }
