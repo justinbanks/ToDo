@@ -2,7 +2,9 @@ package com.todo.group1.todo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -10,10 +12,12 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -267,5 +271,34 @@ public class MainActivity extends AppCompatActivity
             taskList.add(item);
         }
         return taskList;
+    }
+
+    //function to open the sort Dialog onClick of the sort button
+    public void openDialog(MenuItem item) {
+        DialogFragment newFragment = SortDialogFragment.newInstance();
+        newFragment.show(getSupportFragmentManager(), "dialog");
+    }
+
+    //Dialog Fragment class to build sort Dialog
+    public static class SortDialogFragment extends DialogFragment {
+
+        public static SortDialogFragment newInstance() {
+            SortDialogFragment frag = new SortDialogFragment();
+            return frag;
+        }
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(R.string.toolbar_sort_title)
+                    .setItems(R.array.pref_sort_list_titles, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // The 'which' argument contains the index position
+                            // of the selected item
+                        }
+                    });
+            return builder.create();
+        }
+
     }
 }
