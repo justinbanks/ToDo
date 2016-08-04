@@ -3,6 +3,7 @@ package com.todo.group1.todo;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.DialogFragment;
@@ -26,7 +27,9 @@ import com.todo.group1.todo.data.ToDoContract;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -80,6 +83,9 @@ public class DetailActivity extends AppCompatActivity {
         private Button timeButton;
         private Spinner prioritySpinner;
         private Button addReminderButton;
+
+        // Maps priority IDs to strings
+        private Map<Integer, String> priorityMap;
 
         // ContentValues that will later be inserted into db
         ContentValues values = new ContentValues();
@@ -189,12 +195,21 @@ public class DetailActivity extends AppCompatActivity {
             prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                    //TODO implement
+                    Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    String valueString = parentView.getItemAtPosition(position).toString();
+                    String priorityId = "";
+
+                    for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
+                        int key = e.getKey();
+                        String value = e.getValue();
+                        if (value.equals(valueString))
+                            priorityId = Integer.toString(key);
+                    }
+
+                    //updateTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
                 }
                 @Override
-                public void onNothingSelected(AdapterView<?> parentView) {
-
-                }
+                public void onNothingSelected(AdapterView<?> parentView) { }
             });
 
         }
@@ -250,8 +265,37 @@ public class DetailActivity extends AppCompatActivity {
                     null,
                     null
             );
+            priorityMap = new HashMap<>();
+            while (priorityCursor.moveToNext()) {
+                String prString = priorityCursor.getString(
+                        priorityCursor.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
+                int prId = priorityCursor.getInt(
+                        priorityCursor.getColumnIndex(ToDoContract.TaskPriority._ID));
+                priorityMap.put(prId, prString);
+            }
+        }
 
-            // TODO finish
+        private void updateTask(Uri uri, String columnName, String value) {
+            // Generate ContentValues and insert
+            ContentValues mValues = new ContentValues();
+            mValues.put(columnName, value);
+
+            String wClause = "_id = ?";
+            String [] id = { Integer.toString(item.taskId) };
+
+            this.getContext().getContentResolver().update(
+                    uri,
+                    mValues,
+                    wClause,
+                    id
+            );
+        }
+
+        private void insertTask() {
+            // Generate ContentValues and insert
+            // Get taskId
+            // Set to do item's task id
+            // Set isNew to F
         }
     }
 }

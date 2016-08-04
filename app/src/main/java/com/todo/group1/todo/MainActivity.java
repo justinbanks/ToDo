@@ -6,6 +6,7 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -31,6 +32,8 @@ import android.widget.ListView;
 import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
         testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
         testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
         testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
         testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
         testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
@@ -191,6 +194,90 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    private void setCompletedTasksList() {
+        // Build the Uri
+        Uri uri = ToDoContract.TaskEntry.buildTaskMarkedComplete();
+
+        // Query the database
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
+
+        // Convert cursor to ToDoItem
+        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
+        taskCursor.close();
+
+        // attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
+
+        // Set up the task list adapter
+        mTaskListAdapter =
+                new ArrayAdapter<>(
+                        this, // The current context (this activity)
+                        R.layout.list_item_task, // The name of the layout ID.
+                        R.id.list_item_task_textview, // The ID of the textview to populate.
+                        taskList);
+
+        // Set the listview adapter
+        listview.setAdapter(mTaskListAdapter);
+
+        // This opens the detail view when a list item is clicked
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ToDoItem tasklist = mTaskListAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
+                        .putExtra("ToDoItem", tasklist);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void setUpcomingTasksList() {
+        // Build the Uri
+        // generate a date
+        Calendar cal = Calendar.getInstance();
+        // get dates after tomorrow
+        cal.add(Calendar.DAY_OF_MONTH, 1);
+        Date date = cal.getTime();
+        Uri uri = ToDoContract.TaskEntry.buildTaskAfterDate(date);
+
+        // Query the database
+
+        // Convert the cursor to ToDoItem
+
+        // Attach the task list adapter to the list view
+
+        // Set up the task list adapter
+
+        // Set the listview adapter
+
+        // This opens the detail view when a list item is clicked
+
+    }
+
+    private void setHighPriorityTasksList() {
+        // Build the Uri
+        Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(getString(R.string.priority_high));
+
+        // Query the database
+
+        // Convert the cursor to ToDoItem
+
+        // Attach the task list adapter to the list view
+
+        // Set up the task list adapter
+
+        // Set the listview adapter
+
+        // This opens the detail view when a list item is clicked
+
+    }
+
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -198,11 +285,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.completed_tasks) {
-            // Handle the completed tasks action
+            setCompletedTasksList();
         } else if (id == R.id.upcoming_tasks) {
-            // Handle the upcoming tasks action
+            setUpcomingTasksList();
         } else if (id == R.id.high_priority_tasks) {
-            // Handle the high priority tasks action
+            setHighPriorityTasksList();
         } else if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }
@@ -242,6 +329,7 @@ public class MainActivity extends AppCompatActivity
                 null
         );
         return taskCursor;
+
     }
 
     public List<ToDoItem> retrieveTasksFromCursor(Cursor taskCursor) {
@@ -263,9 +351,9 @@ public class MainActivity extends AppCompatActivity
             int delete = taskCursor.getInt(
                     taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
             boolean is_deleted = (delete != 0);
-
             ToDoItem item = new ToDoItem(title, date, priority, details, label,
                     is_complete, is_deleted);
+            item.taskId = taskCursor.getInt(taskCursor.getColumnIndex(ToDoContract.TaskEntry._ID));
             taskList.add(item);
         }
         return taskList;

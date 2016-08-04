@@ -19,6 +19,7 @@ public class ToDoItem implements Serializable{
     public String label = "";
     public boolean isComplete = false;
     public boolean isDeleted = false;
+    public int taskId;
 
     public ToDoItem(String toDoTitle, long dateInMs, String priority, String details, String label,
                     boolean is_complete, boolean isDeleted){
