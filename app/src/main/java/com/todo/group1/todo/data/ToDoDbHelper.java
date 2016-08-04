@@ -57,7 +57,7 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
 
         final String SQL_INSERT_PRIORITY_HIGH = "INSERT INTO " + TaskPriority.TABLE_NAME +
                 " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
-                + R.string.priority_high + "');" ;
+                + mContext.getString(R.string.priority_high) + "');" ;
 
 
         // Create a table to hold our tasks

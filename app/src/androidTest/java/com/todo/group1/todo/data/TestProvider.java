@@ -8,11 +8,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.test.InstrumentationRegistry;
 
+import com.todo.group1.todo.R;
+
 import java.util.Calendar;
 import java.util.Date;
 
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by Justin Banks on 7/25/16.
@@ -98,7 +100,7 @@ public class TestProvider {
 
         // Test content provider query
         Cursor taskCursor = mContext.getContentResolver().query(
-                ToDoContract.TaskEntry.buildTaskWithPriority("1"),
+                ToDoContract.TaskEntry.buildTaskWithPriority(mContext.getString(R.string.priority_low)),
                 null,
                 null,
                 null,
@@ -117,7 +119,7 @@ public class TestProvider {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues testValues = TestUtilities.createTaskEntryValues();
-        long taskRowId = TestUtilities.insertTaskEntryValues(mContext);
+        TestUtilities.insertTaskEntryValues(mContext);
 
         db.close();
 
@@ -154,7 +156,7 @@ public class TestProvider {
 
         // Test content provider query
         Cursor taskCursor = mContext.getContentResolver().query(
-                ToDoContract.TaskEntry.buildTasksWithLabel("1"),
+                ToDoContract.TaskEntry.buildTasksWithLabel("test_label"),
                 null,
                 null,
                 null,

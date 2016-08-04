@@ -1,6 +1,8 @@
 package com.todo.group1.todo;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.DialogFragment;
@@ -14,10 +16,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+
+import com.todo.group1.todo.data.ToDoContract;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -76,6 +81,9 @@ public class DetailActivity extends AppCompatActivity {
         private Spinner prioritySpinner;
         private Button addReminderButton;
 
+        // ContentValues that will later be inserted into db
+        ContentValues values = new ContentValues();
+
         public DetailFragment() {
             setHasOptionsMenu(true);
         }
@@ -104,6 +112,8 @@ public class DetailActivity extends AppCompatActivity {
             setUpDateSelector();
             setUpPrioritySpinner();
             setUpAddReminderButton();
+
+            getPriorityIds();
 
             // If the view was called with an intent, we want to populate the fields
             Intent intent = getActivity().getIntent();
@@ -175,6 +185,18 @@ public class DetailActivity extends AppCompatActivity {
                     R.array.detail_priority_values, android.R.layout.simple_spinner_item);
             adapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
             prioritySpinner.setAdapter(adapter);
+
+            prioritySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                    //TODO implement
+                }
+                @Override
+                public void onNothingSelected(AdapterView<?> parentView) {
+
+                }
+            });
+
         }
 
         /**
@@ -218,6 +240,18 @@ public class DetailActivity extends AppCompatActivity {
                 smp = new SimpleDateFormat("h:mm a", Locale.US);
                 timeButton.setText(smp.format(item.calTime.getTime()));
             }
+        }
+
+        private void getPriorityIds() {
+            Cursor priorityCursor = getContext().getContentResolver().query(
+                    ToDoContract.TaskPriority.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            // TODO finish
         }
     }
 }

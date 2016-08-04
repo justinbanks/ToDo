@@ -64,6 +64,58 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    private Cursor getTasksWithPriority(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getTasksAfterDate(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getTasksWithLabel(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri)};
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getTasksMarkedComplete(Uri uri, String [] projection, String sortOrder) {
+        // 1 means the task is marked complete
+        String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -71,10 +123,10 @@ public class ToDoProvider extends ContentProvider {
 
         // Use the addURI function to match each of the types
         matcher.addURI(authority, ToDoContract.PATH_TASK, TASKS);
-        matcher.addURI(authority, ToDoContract.PATH_TASK + "/priority/#", TASKS_WITH_PRIORITY);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/priority/*", TASKS_WITH_PRIORITY);
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/date/#", TASKS_AFTER_DATE);
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/complete", TASKS_MARKED_COMPLETE);
-        matcher.addURI(authority, ToDoContract.PATH_TASK + "/label/#", TASKS_WITH_LABEL);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/label/*", TASKS_WITH_LABEL);
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
         matcher.addURI(authority, ToDoContract.PATH_LABEL + "/#", LABELS_WITH_TASK);
@@ -135,62 +187,22 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_WITH_PRIORITY:
             {
-                selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
-                selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ToDoContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getTasksWithPriority(uri, projection, sortOrder);
                 break;
             }
             case TASKS_AFTER_DATE:
             {
-                selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
-                selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ToDoContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getTasksAfterDate(uri, projection, sortOrder);
                 break;
             }
             case TASKS_WITH_LABEL:
             {
-                selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
-                selectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri)};
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ToDoContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getTasksWithLabel(uri, projection, sortOrder);
                 break;
             }
             case TASKS_MARKED_COMPLETE:
             {
-                // 1 means the task is marked complete
-                selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                        ToDoContract.TaskEntry.TABLE_NAME,
-                        projection,
-                        selection,
-                        selectionArgs,
-                        null,
-                        null,
-                        sortOrder
-                );
+                retCursor = getTasksMarkedComplete(uri, projection, sortOrder);
                 break;
             }
             case LABEL:
