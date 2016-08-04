@@ -124,7 +124,6 @@ public class MainActivity extends AppCompatActivity
         List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
         taskCursor.close();
 
-
         // set up the task list adapter
         mTaskListAdapter =
                 new ArrayAdapter<>(
