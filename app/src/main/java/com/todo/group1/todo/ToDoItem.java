@@ -56,5 +56,4 @@ public class ToDoItem implements Serializable{
         dueHour = calTime.get(Calendar.HOUR);
         dueMinute = calTime.get(Calendar.MINUTE);
     }
-
 }

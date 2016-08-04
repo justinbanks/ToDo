@@ -31,12 +31,16 @@ import android.widget.ListView;
 import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    private List<ToDoItem> taskList = new ArrayList<>();
     private ArrayAdapter<ToDoItem> mTaskListAdapter;
+
     EditText input;
 
     @Override
@@ -116,8 +120,34 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
         testValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
-
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        ContentValues testValues2 = new ContentValues();
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Catch pokemon");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues2);
+
+        ContentValues testValues3 = new ContentValues();
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Zap bugs");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues3);
+
 
         // Set up our tasklist
         Cursor taskCursor = getAllTasks();
@@ -137,9 +167,9 @@ public class MainActivity extends AppCompatActivity
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
 
+        //updates listview when input is put into the search bar
         input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
-
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {
@@ -170,13 +200,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //hides soft keyboard when search is not focus
         input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                         @Override
                        public void onFocusChange(View v, boolean hasFocus) {
-                                if (!hasFocus) {
-                                        hideKeyboard(v);
-                                    }
+                            if (!hasFocus)
+                            {
+                                hideKeyboard(v);
                             }
+                        }
                     });
     }
 
@@ -219,11 +251,13 @@ public class MainActivity extends AppCompatActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    //hides soft keyboard
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    //hides or shows the search bar when search icon is clicked
     public void hideSearch(MenuItem item) {
         if(input.getVisibility() == View.GONE)
             input.setVisibility(View.VISIBLE);
@@ -268,5 +302,14 @@ public class MainActivity extends AppCompatActivity
             taskList.add(item);
         }
         return taskList;
+    }
+
+    public void sortMenu(){
+
+    }
+
+    public int sortList(ToDoItem arg0, ToDoItem arg1)
+    {
+        return arg0.toDoTitle.compareTo(arg1.toDoTitle);
     }
 }

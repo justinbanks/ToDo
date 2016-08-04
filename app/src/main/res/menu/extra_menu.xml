@@ -6,7 +6,8 @@
         android:title="@string/action_sort"
         android:id="@+id/action_sort"
         app:showAsAction="ifRoom"
-        android:icon="@drawable/ic_swap_vert_white_36dp">
+        android:icon="@drawable/ic_swap_vert_white_36dp"
+        android:onClick="sortList">
     </item>
 
     <item android:title="@string/action_search"
