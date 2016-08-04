@@ -3,6 +3,7 @@ package com.todo.group1.todo;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -31,15 +32,15 @@ import android.widget.ListView;
 import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+
+import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private List<ToDoItem> taskList = new ArrayList<>();
     private ArrayAdapter<ToDoItem> mTaskListAdapter;
+    private List<ToDoItem> toDoItemList;
 
     EditText input;
 
@@ -119,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
         testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
+        testValues.put(COLUMN_TITLE, "Buy a plant");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
 
         ContentValues testValues2 = new ContentValues();
@@ -132,7 +133,7 @@ public class MainActivity extends AppCompatActivity
         testValues2.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
         testValues2.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues2.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Catch pokemon");
+        testValues2.put(COLUMN_TITLE, "Catch pokemon");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues2);
 
         ContentValues testValues3 = new ContentValues();
@@ -145,7 +146,7 @@ public class MainActivity extends AppCompatActivity
         testValues3.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
         testValues3.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues3.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Zap bugs");
+        testValues3.put(COLUMN_TITLE, "Zap bugs");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues3);
 
 
@@ -259,9 +260,15 @@ public class MainActivity extends AppCompatActivity
 
     //hides or shows the search bar when search icon is clicked
     public void hideSearch(MenuItem item) {
-        if(input.getVisibility() == View.GONE)
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (input.getVisibility() == View.GONE)
+        {
             input.setVisibility(View.VISIBLE);
-        else if(input.getVisibility() == View.VISIBLE)
+            input.requestFocus();
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        }
+        else if (input.getVisibility() == View.VISIBLE)
             input.setVisibility(View.GONE);
     }
 
@@ -281,7 +288,7 @@ public class MainActivity extends AppCompatActivity
         List<ToDoItem> taskList = new ArrayList<>();
         while (taskCursor.moveToNext()) {
             String title = taskCursor.getString(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE));
+                    taskCursor.getColumnIndex(COLUMN_TITLE));
             String details = taskCursor.getString(taskCursor.getColumnIndex(
                     ToDoContract.TaskEntry.COLUMN_DETAIL));
             String label = taskCursor.getString(
@@ -304,12 +311,11 @@ public class MainActivity extends AppCompatActivity
         return taskList;
     }
 
-    public void sortMenu(){
 
-    }
 
-    public int sortList(ToDoItem arg0, ToDoItem arg1)
+    public void sortList(MenuItem item)
     {
-        return arg0.toDoTitle.compareTo(arg1.toDoTitle);
+
     }
+
 }
