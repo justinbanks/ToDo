@@ -32,6 +32,8 @@ import android.widget.ListView;
 import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
@@ -40,8 +42,7 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayAdapter<ToDoItem> mTaskListAdapter;
-    private List<ToDoItem> toDoItemList;
-
+    MenuItem sort;
     EditText input;
 
     @Override
@@ -149,6 +150,19 @@ public class MainActivity extends AppCompatActivity
         testValues3.put(COLUMN_TITLE, "Zap bugs");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues3);
 
+        ContentValues testValues4 = new ContentValues();
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues4.put(COLUMN_TITLE, "Apply for job");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues4);
+
 
         // Set up our tasklist
         Cursor taskCursor = getAllTasks();
@@ -167,6 +181,13 @@ public class MainActivity extends AppCompatActivity
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
+
+        Collections.sort(taskList, new Comparator<ToDoItem>() {
+            @Override
+            public int compare(ToDoItem t0, ToDoItem t1) {
+                return -t0.toString().compareToIgnoreCase(t1.toString());
+            }
+        });
 
         //updates listview when input is put into the search bar
         input = (EditText) findViewById(R.id.inputSearch);
@@ -189,6 +210,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         });
+
 
         // This opens the detail view when a list item is clicked
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -310,12 +332,4 @@ public class MainActivity extends AppCompatActivity
         }
         return taskList;
     }
-
-
-
-    public void sortList(MenuItem item)
-    {
-
-    }
-
 }
