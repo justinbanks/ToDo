@@ -65,6 +65,7 @@ public class DetailActivity extends AppCompatActivity {
 
         private View rootview;
         private ToDoItem item;
+        private boolean isNew;
 
         // find our UI elements
         private EditText editTitle;
@@ -107,8 +108,12 @@ public class DetailActivity extends AppCompatActivity {
             // If the view was called with an intent, we want to populate the fields
             Intent intent = getActivity().getIntent();
             if (intent != null && intent.hasExtra("ToDoItem")) {
+                isNew = false;
                 item = (ToDoItem) intent.getSerializableExtra("ToDoItem");
                 populateFields(item);
+            }
+            else {
+                isNew = true;
             }
 
             return rootview;

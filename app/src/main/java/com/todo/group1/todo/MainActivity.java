@@ -136,9 +136,11 @@ public class MainActivity extends AppCompatActivity
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
 
+        // Set up the search bar
         input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
 
+        // Search data change detection
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {

@@ -13,11 +13,6 @@ public class ToDoItem implements Serializable{
 
     public String toDoTitle = "";
     public long dateInMs = 0;
-    public int dueDay = 1;
-    public int dueMonth = 1;
-    public int dueYear = 1970;
-    public int dueHour = 12;
-    public int dueMinute = 0;
     public Calendar calTime;
     public String priority = "None";
     public String details = "";
@@ -41,20 +36,22 @@ public class ToDoItem implements Serializable{
         this.toDoTitle = toDoTitle;
     }
 
-    // toString is overriden in order to use the item in an ArrayAdapter
+    /**
+     * ToString is overridden here in order to use a ToDoItem with an ArrayAdapter. This enables
+     * a ToDoItem to be passed between activities.
+     * @return The title of the task.
+     */
     @Override
     public String toString() {
         return toDoTitle;
     }
 
+    /**
+     * Convert the long value datInMs, the amount of milliseconds since epoch, to a calendar value
+     * and store it as a class variable.
+     */
     public void configureTime() {
         calTime = Calendar.getInstance();
         calTime.setTimeInMillis(this.dateInMs);
-        dueDay = calTime.get(Calendar.DAY_OF_MONTH);
-        dueMonth = calTime.get(Calendar.MONTH);
-        dueYear = calTime.get(Calendar.YEAR);
-        dueHour = calTime.get(Calendar.HOUR);
-        dueMinute = calTime.get(Calendar.MINUTE);
     }
-
 }

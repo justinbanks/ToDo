@@ -130,14 +130,6 @@ public class ToDoProvider extends ContentProvider {
         switch(sUriMatcher.match(uri)) {
             case TASKS:
             {
-//                retCursor = mOpenHelper.getReadableDatabase().query(
-//                        ToDoContract.TaskEntry.TABLE_NAME,
-//                        projection,
-//                        selection,
-//                        selectionArgs,
-//                        null,
-//                        null,
-//                        sortOrder
                 retCursor = getTasks(uri, projection, sortOrder);
                 break;
             }
