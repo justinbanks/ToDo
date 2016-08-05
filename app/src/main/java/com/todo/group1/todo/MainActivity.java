@@ -2,9 +2,7 @@ package com.todo.group1.todo;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Dialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -15,11 +13,13 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
@@ -30,7 +30,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
@@ -38,22 +37,24 @@ import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener,
+        LoaderManager.LoaderCallbacks<Cursor> {
 
-    private ArrayAdapter<ToDoItem> mTaskListAdapter;
-    MenuItem sort;
+    private static final int TASKLIST_LOADER = 0;
+    private TaskListAdapter mTaskListAdapter;
     EditText input;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getSupportLoaderManager().initLoader(TASKLIST_LOADER, null, this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -172,17 +173,17 @@ public class MainActivity extends AppCompatActivity
 
 
         // Set up our tasklist
-        Cursor taskCursor = getAllTasks();
+        Cursor taskCursor = this.getContentResolver().query(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
         List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
-        taskCursor.close();
 
         // set up the task list adapter
-        mTaskListAdapter =
-                new ArrayAdapter<>(
-                        this, // The current context (this activity)
-                        R.layout.list_item_task, // The name of the layout ID.
-                        R.id.list_item_task_textview, // The ID of the textview to populate.
-                        taskList);
+        mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
@@ -228,10 +229,7 @@ public class MainActivity extends AppCompatActivity
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                ToDoItem tasklist = mTaskListAdapter.getItem(position);
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
-                        .putExtra("ToDoItem", tasklist);
-                startActivity(intent);
+
             }
         });
 
@@ -257,6 +255,33 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     *
+     * Loader Functions
+     *
+     *
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader (int i, Bundle bundle) {
+        return new CursorLoader(this,
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mTaskListAdapter.swapCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mTaskListAdapter.swapCursor(null);
+    }
+
     private void setCompletedTasksList() {
         // Build the Uri
         Uri uri = ToDoContract.TaskEntry.buildTaskMarkedComplete();
@@ -270,20 +295,11 @@ public class MainActivity extends AppCompatActivity
                 null
         );
 
-        // Convert cursor to ToDoItem
-        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
-        taskCursor.close();
+        // Set up the task list adapter
+        mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
-
-        // Set up the task list adapter
-        mTaskListAdapter =
-                new ArrayAdapter<>(
-                        this, // The current context (this activity)
-                        R.layout.list_item_task, // The name of the layout ID.
-                        R.id.list_item_task_textview, // The ID of the textview to populate.
-                        taskList);
 
         // Set the listview adapter
         listview.setAdapter(mTaskListAdapter);
@@ -379,19 +395,6 @@ public class MainActivity extends AppCompatActivity
             input.setVisibility(View.GONE);
     }
 
-    public Cursor getAllTasks() {
-        // Test content provider query
-        Cursor taskCursor = this.getContentResolver().query(
-                ToDoContract.TaskEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        return taskCursor;
-
-    }
-
     public List<ToDoItem> retrieveTasksFromCursor(Cursor taskCursor) {
         List<ToDoItem> taskList = new ArrayList<>();
         while (taskCursor.moveToNext()) {
@@ -423,28 +426,5 @@ public class MainActivity extends AppCompatActivity
     public void openDialog(MenuItem item) {
         DialogFragment newFragment = SortDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), "dialog");
-    }
-
-    //Dialog Fragment class to build sort Dialog
-    public static class SortDialogFragment extends DialogFragment {
-
-        public static SortDialogFragment newInstance() {
-            SortDialogFragment frag = new SortDialogFragment();
-            return frag;
-        }
-
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(R.string.toolbar_sort_title)
-                    .setItems(R.array.pref_sort_list_titles, new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            // The 'which' argument contains the index position
-                            // of the selected item
-                        }
-                    });
-            return builder.create();
-        }
-
     }
 }
