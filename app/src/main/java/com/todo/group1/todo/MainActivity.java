@@ -287,17 +287,6 @@ public class MainActivity extends AppCompatActivity
 
         // Set the listview adapter
         listview.setAdapter(mTaskListAdapter);
-
-        // This opens the detail view when a list item is clicked
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                ToDoItem tasklist = mTaskListAdapter.getItem(position);
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
-                        .putExtra("ToDoItem", tasklist);
-                startActivity(intent);
-            }
-        });
     }
 
     private void setUpcomingTasksList() {

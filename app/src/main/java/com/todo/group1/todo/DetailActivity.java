@@ -3,6 +3,7 @@ package com.todo.group1.todo;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -199,14 +200,20 @@ public class DetailActivity extends AppCompatActivity {
                     String valueString = parentView.getItemAtPosition(position).toString();
                     String priorityId = "";
 
-                    for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
-                        int key = e.getKey();
-                        String value = e.getValue();
-                        if (value.equals(valueString))
-                            priorityId = Integer.toString(key);
+                    // Only update if it's a freshly changed value
+                    if (!valueString.equals(item.priority)) {
+                        for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
+                            int key = e.getKey();
+                            String value = e.getValue();
+                            if (value.equals(valueString))
+                                priorityId = Integer.toString(key);
+                        }
+                        if (isNew)
+                            insertTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
+                        else
+                            updateTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
                     }
 
-                    //updateTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
                 }
                 @Override
                 public void onNothingSelected(AdapterView<?> parentView) { }
@@ -289,9 +296,18 @@ public class DetailActivity extends AppCompatActivity {
                     wClause,
                     id
             );
+
+            Cursor c = this.getContext().getContentResolver().query(
+                    ToDoContract.TaskEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            String hey = DatabaseUtils.dumpCursorToString(c);
         }
 
-        private void insertTask() {
+        private void insertTask(Uri uri, String columnName, String value) {
             // Generate ContentValues and insert
             // Get taskId
             // Set to do item's task id

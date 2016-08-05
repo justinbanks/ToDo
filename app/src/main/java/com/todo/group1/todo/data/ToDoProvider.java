@@ -36,6 +36,19 @@ public class ToDoProvider extends ContentProvider {
     static final int PRIORITY_WITH_ID = 501;
 
     private static final SQLiteQueryBuilder sTasksWithPriorityAndLabels = new SQLiteQueryBuilder();
+    private static final String [] TASK_COLUMNS_TO_RETURN = {
+            ToDoContract.TaskEntry.TABLE_NAME + "." + ToDoContract.TaskEntry._ID,
+            ToDoContract.TaskEntry.COLUMN_TITLE,
+            ToDoContract.TaskEntry.COLUMN_DETAIL,
+            ToDoContract.TaskEntry.COLUMN_DUE_DATE,
+            ToDoContract.TaskEntry.COLUMN_CREATE_DATE,
+            ToDoContract.TaskEntry.COLUMN_LABEL_ID,
+            ToDoContract.TaskLabel.COLUMN_LABEL,
+            ToDoContract.TaskEntry.COLUMN_PRIORITY_ID,
+            ToDoContract.TaskPriority.COLUMN_PRIORITY,
+            ToDoContract.TaskEntry.COLUMN_IS_COMPLETED,
+            ToDoContract.TaskEntry.COLUMN_IS_DELETED
+    };
 
     static {
         sTasksWithPriorityAndLabels.setTables(
@@ -55,7 +68,7 @@ public class ToDoProvider extends ContentProvider {
 
     private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS_TO_RETURN,
                 null,
                 null,
                 null,
@@ -68,7 +81,7 @@ public class ToDoProvider extends ContentProvider {
         String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS_TO_RETURN,
                 selection,
                 selectionArgs,
                 null,
@@ -81,7 +94,7 @@ public class ToDoProvider extends ContentProvider {
         String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS_TO_RETURN,
                 selection,
                 selectionArgs,
                 null,
