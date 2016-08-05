@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -38,12 +39,17 @@ import com.todo.group1.todo.data.ToDoContract;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+
+import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private ArrayAdapter<ToDoItem> mTaskListAdapter;
+    MenuItem sort;
     EditText input;
 
     @Override
@@ -122,9 +128,48 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
         testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
-
+        testValues.put(COLUMN_TITLE, "Buy a plant");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        ContentValues testValues2 = new ContentValues();
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues2.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues2.put(COLUMN_TITLE, "Catch pokemon");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues2);
+
+        ContentValues testValues3 = new ContentValues();
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues3.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues3.put(COLUMN_TITLE, "Zap bugs");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues3);
+
+        ContentValues testValues4 = new ContentValues();
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues4.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues4.put(COLUMN_TITLE, "Apply for job");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues4);
+
 
         // Set up our tasklist
         Cursor taskCursor = getAllTasks();
@@ -148,6 +193,17 @@ public class MainActivity extends AppCompatActivity
         listview.setTextFilterEnabled(true);
 
         // Search data change detection
+        Collections.sort(taskList, new Comparator<ToDoItem>() {
+            @Override
+            public int compare(ToDoItem t0, ToDoItem t1) {
+                return -t0.toString().compareToIgnoreCase(t1.toString());
+            }
+        });
+
+        //updates listview when input is put into the search bar
+        input = (EditText) findViewById(R.id.inputSearch);
+        listview.setTextFilterEnabled(true);
+
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {
@@ -167,6 +223,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+
         // This opens the detail view when a list item is clicked
         listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -178,13 +235,15 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
+        //hides soft keyboard when search is not focus
         input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                         @Override
                        public void onFocusChange(View v, boolean hasFocus) {
-                                if (!hasFocus) {
-                                        hideKeyboard(v);
-                                    }
+                            if (!hasFocus)
+                            {
+                                hideKeyboard(v);
                             }
+                        }
                     });
     }
 
@@ -311,15 +370,23 @@ public class MainActivity extends AppCompatActivity
         return super.onCreateOptionsMenu(menu);
     }
 
+    //hides soft keyboard
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
+    //hides or shows the search bar when search icon is clicked
     public void hideSearch(MenuItem item) {
-        if(input.getVisibility() == View.GONE)
+
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (input.getVisibility() == View.GONE)
+        {
             input.setVisibility(View.VISIBLE);
-        else if(input.getVisibility() == View.VISIBLE)
+            input.requestFocus();
+            imm.showSoftInput(input, InputMethodManager.SHOW_IMPLICIT);
+        }
+        else if (input.getVisibility() == View.VISIBLE)
             input.setVisibility(View.GONE);
     }
 
@@ -340,7 +407,7 @@ public class MainActivity extends AppCompatActivity
         List<ToDoItem> taskList = new ArrayList<>();
         while (taskCursor.moveToNext()) {
             String title = taskCursor.getString(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE));
+                    taskCursor.getColumnIndex(COLUMN_TITLE));
             String details = taskCursor.getString(taskCursor.getColumnIndex(
                     ToDoContract.TaskEntry.COLUMN_DETAIL));
             String label = taskCursor.getString(
