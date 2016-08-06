@@ -35,7 +35,9 @@
         </activity>
         <provider
             android:authorities="com.todo.group1.todo"
-            android:name=".data.ToDoProvider">
+            android:name=".data.ToDoProvider"
+            android:enabled="true"
+            android:exported="true">
         </provider>
     </application>
 

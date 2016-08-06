@@ -197,7 +197,7 @@ public class DetailActivity extends AppCompatActivity {
 
             setUpTimeSelector();
             setUpDateSelector();
-//            setUpPrioritySpinner();
+            setUpPrioritySpinner();
             setUpAddReminderButton();
 
             getPriorityIds();
@@ -206,9 +206,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-
-        }
+        public void onLoaderReset(Loader<Cursor> loader) { }
 
         /**
          * Configure the date selector. Set the onlickListener to the DatePickerFragment
@@ -339,14 +337,6 @@ public class DetailActivity extends AppCompatActivity {
                     mValues,
                     wClause,
                     id
-            );
-
-            Cursor c = this.getContext().getContentResolver().query(
-                    ToDoContract.TaskEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
             );
         }
 

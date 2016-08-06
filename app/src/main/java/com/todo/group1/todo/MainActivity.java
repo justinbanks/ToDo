@@ -1,20 +1,19 @@
 package com.todo.group1.todo;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
@@ -73,59 +72,16 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        // We need to request write permissions at runtime for API > 23
-        final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 0;
-        if (ContextCompat.checkSelfPermission(this,
-                Manifest.permission.READ_CONTACTS)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.READ_CONTACTS},
-                    MY_PERMISSIONS_REQUEST_READ_CONTACTS);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        if (!prefs.getBoolean("firstTime", false)) {
+            startUpTestData();
+
+            // mark first time has runned.
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("firstTime", true);
+            editor.apply();
         }
 
-        this.getContentResolver().delete(
-                ToDoContract.TaskEntry.CONTENT_URI,
-                null,
-                null
-        );
-
-        this.getContentResolver().delete(
-                ToDoContract.TaskLabel.CONTENT_URI,
-                null,
-                null
-        );
-
-        ContentValues labelValues = new ContentValues();
-        labelValues.put(ToDoContract.TaskLabel.COLUMN_LABEL, "YEEEESSS");
-        this.getContentResolver().insert(ToDoContract.TaskLabel.CONTENT_URI, labelValues);
-
-        Cursor labelCursor = this.getContentResolver().query(
-                ToDoContract.TaskLabel.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        int validLabelId = -1;
-        while (labelCursor.moveToNext()) {
-            validLabelId = labelCursor.getInt(
-                    labelCursor.getColumnIndex(ToDoContract.TaskLabel._ID));
-        }
-
-        // generating some test data
-        long currentTime = System.currentTimeMillis() + 1000000;
-        ContentValues testValues = new ContentValues();
-        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(COLUMN_TITLE, "Buy a plant");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
 
         // Set up our tasklist
         Cursor taskCursor = this.getContentResolver().query(
@@ -150,6 +106,7 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                String curs = DatabaseUtils.dumpCursorToString(cursor);
                 int id = cursor.getInt(cursor.getColumnIndex(ToDoContract.TaskEntry._ID));
 
                 if (cursor != null) {
@@ -204,6 +161,52 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     });
+    }
+
+    public void startUpTestData() {
+        this.getContentResolver().delete(
+                ToDoContract.TaskEntry.CONTENT_URI,
+                null,
+                null
+        );
+
+        this.getContentResolver().delete(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null
+        );
+
+        ContentValues labelValues = new ContentValues();
+        labelValues.put(ToDoContract.TaskLabel.COLUMN_LABEL, "YEEEESSS");
+        this.getContentResolver().insert(ToDoContract.TaskLabel.CONTENT_URI, labelValues);
+
+        Cursor labelCursor = this.getContentResolver().query(
+                ToDoContract.TaskLabel.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        int validLabelId = -1;
+        while (labelCursor.moveToNext()) {
+            validLabelId = labelCursor.getInt(
+                    labelCursor.getColumnIndex(ToDoContract.TaskLabel._ID));
+        }
+
+        // generating some test data
+        long currentTime = System.currentTimeMillis() + 1000000;
+        ContentValues testValues = new ContentValues();
+        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues.put(COLUMN_TITLE, "Buy a plant");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
     }
 
     @Override

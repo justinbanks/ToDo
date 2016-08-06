@@ -33,13 +33,13 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
 
         // Create a table to hold our labels
         final String SQL_CREATE_LABEL_TABLE = "CREATE TABLE " + TaskLabel.TABLE_NAME + " (" +
-                TaskLabel._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                TaskLabel._ID + " INTEGER PRIMARY KEY," +
                 TaskLabel.COLUMN_LABEL + " TEXT NOT NULL " +
                 " );";
 
         // Create a table to hold our priorities
         final String SQL_CREATE_PRIORITY_TABLE = "CREATE TABLE " + TaskPriority.TABLE_NAME + " (" +
-                TaskPriority._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                TaskPriority._ID + " INTEGER PRIMARY KEY," +
                 TaskPriority.COLUMN_PRIORITY + " TEXT NOT NULL " +
                 " );";
 
@@ -62,7 +62,7 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
 
         // Create a table to hold our tasks
         final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
-                TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                TaskEntry._ID + " INTEGER PRIMARY KEY," +
                 TaskEntry.COLUMN_CREATE_DATE + " INTEGER NOT NULL," +
                 TaskEntry.COLUMN_DUE_DATE + " INTEGER," +
                 TaskEntry.COLUMN_TITLE + " TEXT NOT NULL," +
