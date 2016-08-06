@@ -310,16 +310,42 @@ public class MainActivity extends AppCompatActivity
         Uri uri = ToDoContract.TaskEntry.buildTaskAfterDate(date);
 
         // Query the database
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
 
         // Convert the cursor to ToDoItem
+        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
+        taskCursor.close();
 
         // Attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
 
         // Set up the task list adapter
+        mTaskListAdapter =
+                new ArrayAdapter<>(
+                        this, // The current context (this activity)
+                        R.layout.list_item_task, // The name of the layout ID.
+                        R.id.list_item_task_textview, // The ID of the textview to populate.
+                        taskList);
 
         // Set the listview adapter
+        listview.setAdapter(mTaskListAdapter);
 
         // This opens the detail view when a list item is clicked
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ToDoItem tasklist = mTaskListAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
+                        .putExtra("ToDoItem", tasklist);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -328,16 +354,42 @@ public class MainActivity extends AppCompatActivity
         Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(getString(R.string.priority_high));
 
         // Query the database
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
 
         // Convert the cursor to ToDoItem
+        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
+        taskCursor.close();
 
         // Attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
 
         // Set up the task list adapter
+        mTaskListAdapter =
+                new ArrayAdapter<>(
+                        this, // The current context (this activity)
+                        R.layout.list_item_task, // The name of the layout ID.
+                        R.id.list_item_task_textview, // The ID of the textview to populate.
+                        taskList);
 
         // Set the listview adapter
+        listview.setAdapter(mTaskListAdapter);
 
         // This opens the detail view when a list item is clicked
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                ToDoItem tasklist = mTaskListAdapter.getItem(position);
+                Intent intent = new Intent(MainActivity.this, DetailActivity.class)
+                        .putExtra("ToDoItem", tasklist);
+                startActivity(intent);
+            }
+        });
 
     }
 
