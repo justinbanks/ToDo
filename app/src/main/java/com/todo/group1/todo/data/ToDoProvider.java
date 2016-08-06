@@ -27,6 +27,7 @@ public class ToDoProvider extends ContentProvider {
     static final int TASKS_AFTER_DATE = 102;
     static final int TASKS_MARKED_COMPLETE = 103;
     static final int TASKS_WITH_LABEL = 104;
+    static final int TASK_WITH_ID = 105;
 
     static final int LABEL = 300;
     static final int LABELS_WITH_TASK = 301;
@@ -36,7 +37,7 @@ public class ToDoProvider extends ContentProvider {
     static final int PRIORITY_WITH_ID = 501;
 
     private static final SQLiteQueryBuilder sTasksWithPriorityAndLabels = new SQLiteQueryBuilder();
-    private static final String [] TASK_COLUMNS_TO_RETURN = {
+    public static final String [] TASK_COLUMNS = {
             ToDoContract.TaskEntry.TABLE_NAME + "." + ToDoContract.TaskEntry._ID,
             ToDoContract.TaskEntry.COLUMN_TITLE,
             ToDoContract.TaskEntry.COLUMN_DETAIL,
@@ -68,7 +69,7 @@ public class ToDoProvider extends ContentProvider {
 
     private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                TASK_COLUMNS_TO_RETURN,
+                TASK_COLUMNS,
                 null,
                 null,
                 null,
@@ -81,7 +82,7 @@ public class ToDoProvider extends ContentProvider {
         String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                TASK_COLUMNS_TO_RETURN,
+                TASK_COLUMNS,
                 selection,
                 selectionArgs,
                 null,
@@ -94,7 +95,7 @@ public class ToDoProvider extends ContentProvider {
         String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                TASK_COLUMNS_TO_RETURN,
+                TASK_COLUMNS,
                 selection,
                 selectionArgs,
                 null,
@@ -129,6 +130,20 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    private Cursor getTaskWithId(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.TABLE_NAME + "." +
+                ToDoContract.TaskEntry._ID + " = ?";
+        String [] selectionArgs = new String [] { ToDoContract.TaskEntry.getTaskIdFromUri(uri) };
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -140,9 +155,9 @@ public class ToDoProvider extends ContentProvider {
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/date/#", TASKS_AFTER_DATE);
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/complete", TASKS_MARKED_COMPLETE);
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/label/*", TASKS_WITH_LABEL);
+        matcher.addURI(authority, ToDoContract.PATH_TASK + "/id/#", TASK_WITH_ID);
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
-        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/#", LABELS_WITH_TASK);
         matcher.addURI(authority, ToDoContract.PATH_LABEL + "/id/#", LABEL_WITH_ID);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
@@ -171,9 +186,9 @@ public class ToDoProvider extends ContentProvider {
                 return ToDoContract.TaskEntry.CONTENT_TYPE;
             case TASKS_WITH_LABEL:
                 return ToDoContract.TaskEntry.CONTENT_TYPE;
+            case TASK_WITH_ID:
+                return ToDoContract.TaskEntry.CONTENT_ITEM_TYPE;
             case LABEL:
-                return ToDoContract.TaskLabel.CONTENT_TYPE;
-            case LABELS_WITH_TASK:
                 return ToDoContract.TaskLabel.CONTENT_TYPE;
             case LABEL_WITH_ID:
                 return ToDoContract.TaskLabel.CONTENT_ITEM_TYPE;
@@ -218,6 +233,11 @@ public class ToDoProvider extends ContentProvider {
                 retCursor = getTasksMarkedComplete(uri, projection, sortOrder);
                 break;
             }
+            case TASK_WITH_ID:
+            {
+                retCursor = getTaskWithId(uri, projection, sortOrder);
+                break;
+            }
             case LABEL:
             {
                 retCursor = mOpenHelper.getReadableDatabase().query(
@@ -229,22 +249,6 @@ public class ToDoProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
-                break;
-            }
-            case LABELS_WITH_TASK:
-            {
-                // TODO fix this monstrosity (it doesn't do what you want)
-                selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
-                selectionArgs = new String[] {ToDoContract.TaskLabel.getLabelFromUri(uri)};
-                retCursor = mOpenHelper.getReadableDatabase().query(
-                    ToDoContract.TaskEntry.TABLE_NAME,
-                    projection,
-                    selection,
-                    selectionArgs,
-                    null,
-                    null,
-                    sortOrder
-            );
                 break;
             }
             case LABEL_WITH_ID:

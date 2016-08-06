@@ -35,18 +35,14 @@ import android.widget.ListView;
 
 import com.todo.group1.todo.data.ToDoContract;
 
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
-import java.util.List;
 
 import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener,
-        LoaderManager.LoaderCallbacks<Cursor> {
+        implements LoaderManager.LoaderCallbacks<Cursor>,
+        NavigationView.OnNavigationItemSelectedListener {
 
     private static final int TASKLIST_LOADER = 0;
     private TaskListAdapter mTaskListAdapter;
@@ -54,7 +50,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        getSupportLoaderManager().initLoader(TASKLIST_LOADER, null, this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -132,46 +127,6 @@ public class MainActivity extends AppCompatActivity
         testValues.put(COLUMN_TITLE, "Buy a plant");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
 
-        ContentValues testValues2 = new ContentValues();
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues2.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues2.put(COLUMN_TITLE, "Catch pokemon");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues2);
-
-        ContentValues testValues3 = new ContentValues();
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues3.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues3.put(COLUMN_TITLE, "Zap bugs");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues3);
-
-        ContentValues testValues4 = new ContentValues();
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues4.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues4.put(COLUMN_TITLE, "Apply for job");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues4);
-
-
         // Set up our tasklist
         Cursor taskCursor = this.getContentResolver().query(
                 ToDoContract.TaskEntry.CONTENT_URI,
@@ -180,26 +135,42 @@ public class MainActivity extends AppCompatActivity
                 null,
                 null
         );
-        List<ToDoItem> taskList = retrieveTasksFromCursor(taskCursor);
 
         // set up the task list adapter
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+        getSupportLoaderManager().initLoader(TASKLIST_LOADER, null, this);
+
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
+
+        // This opens the detail view when a list item is clicked
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                int id = cursor.getInt(cursor.getColumnIndex(ToDoContract.TaskEntry._ID));
+
+                if (cursor != null) {
+                    Intent intent = new Intent (MainActivity.this, DetailActivity.class)
+                            .setData(ToDoContract.TaskEntry.buildTaskWithId(Integer.toString(id)));
+                    startActivity(intent);
+                }
+            }
+        });
 
         // Set up the search bar
         input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
 
         // Search data change detection
-        Collections.sort(taskList, new Comparator<ToDoItem>() {
-            @Override
-            public int compare(ToDoItem t0, ToDoItem t1) {
-                return -t0.toString().compareToIgnoreCase(t1.toString());
-            }
-        });
+//        Collections.sort(taskList, new Comparator<ToDoItem>() {
+//            @Override
+//            public int compare(ToDoItem t0, ToDoItem t1) {
+//                return -t0.toString().compareToIgnoreCase(t1.toString());
+//            }
+//        });
 
         //updates listview when input is put into the search bar
         input = (EditText) findViewById(R.id.inputSearch);
@@ -214,21 +185,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onTextChanged(CharSequence arg0, int i, int i1, int i2) {
                 MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
-
             }
 
             @Override
             public void afterTextChanged(Editable arg0) {
                 MainActivity.this.mTaskListAdapter.getFilter().filter(arg0);
-
-            }
-        });
-
-
-        // This opens the detail view when a list item is clicked
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
             }
         });
@@ -393,33 +354,6 @@ public class MainActivity extends AppCompatActivity
         }
         else if (input.getVisibility() == View.VISIBLE)
             input.setVisibility(View.GONE);
-    }
-
-    public List<ToDoItem> retrieveTasksFromCursor(Cursor taskCursor) {
-        List<ToDoItem> taskList = new ArrayList<>();
-        while (taskCursor.moveToNext()) {
-            String title = taskCursor.getString(
-                    taskCursor.getColumnIndex(COLUMN_TITLE));
-            String details = taskCursor.getString(taskCursor.getColumnIndex(
-                    ToDoContract.TaskEntry.COLUMN_DETAIL));
-            String label = taskCursor.getString(
-                    taskCursor.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
-            long date = taskCursor.getLong(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
-            String priority = taskCursor.getString(
-                    taskCursor.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
-            int complete = taskCursor.getInt(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
-            boolean is_complete = (complete != 0);
-            int delete = taskCursor.getInt(
-                    taskCursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
-            boolean is_deleted = (delete != 0);
-            ToDoItem item = new ToDoItem(title, date, priority, details, label,
-                    is_complete, is_deleted);
-            item.taskId = taskCursor.getInt(taskCursor.getColumnIndex(ToDoContract.TaskEntry._ID));
-            taskList.add(item);
-        }
-        return taskList;
     }
 
     //function to open the sort Dialog onClick of the sort button

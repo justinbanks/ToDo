@@ -3,13 +3,15 @@ package com.todo.group1.todo;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -31,6 +33,8 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -68,12 +72,16 @@ public class DetailActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
-    public static class DetailFragment extends Fragment {
+
+
+    public static class DetailFragment extends Fragment
+            implements LoaderManager.LoaderCallbacks<Cursor> {
 
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
+        private static final int DETAIL_LOADER = 0;
 
         private View rootview;
-        private ToDoItem item;
+        private ToDoItem toDoItem;
         private boolean isNew;
 
         // find our UI elements
@@ -105,34 +113,6 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
             rootview = inflater.inflate(R.layout.fragment_detail, container, false);
-
-            // find our UI elements
-            editTitle = (EditText) rootview.findViewById(R.id.edit_title);
-            editLabel = (EditText) rootview.findViewById(R.id.edit_label);
-            editDetails = (EditText) rootview.findViewById(R.id.edit_details);
-            dateButton = (Button) rootview.findViewById(R.id.date_selector);
-            timeButton = (Button) rootview.findViewById(R.id.time_selector);
-            prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
-            addReminderButton = (Button) rootview.findViewById(R.id.add_reminder_button);
-
-            setUpTimeSelector();
-            setUpDateSelector();
-            setUpPrioritySpinner();
-            setUpAddReminderButton();
-
-            getPriorityIds();
-
-            // If the view was called with an intent, we want to populate the fields
-            Intent intent = getActivity().getIntent();
-            if (intent != null && intent.hasExtra("ToDoItem")) {
-                isNew = false;
-                item = (ToDoItem) intent.getSerializableExtra("ToDoItem");
-                populateFields(item);
-            }
-            else {
-                isNew = true;
-            }
-
             return rootview;
         }
 
@@ -164,6 +144,70 @@ public class DetailActivity extends AppCompatActivity {
                     newFragment.show(getFragmentManager(), "timePicker");
                 }
             });
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            getLoaderManager().initLoader(DETAIL_LOADER, null, this);
+            super.onActivityCreated(savedInstanceState);
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            Intent intent = getActivity().getIntent();
+            if (intent == null) {
+                return null;
+            }
+
+            return new CursorLoader(
+                    getActivity(),
+                    intent.getData(),
+                    null,
+                    null,
+                    null,
+                    null
+            );
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            if (!data.moveToFirst()) { return; }
+
+            String title = data.getString(data.getColumnIndex(COLUMN_TITLE));
+            String details = data.getString(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DETAIL));
+            String label = data.getString(data.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
+            long date = data.getLong(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
+            String priority = data.getString(data.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
+            int complete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
+            boolean is_complete = (complete != 0);
+            int delete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
+            boolean is_deleted = (delete != 0);
+
+            toDoItem = new ToDoItem(title, date, priority, details, label, is_complete, is_deleted);
+            toDoItem.taskId = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry._ID));
+
+            // find our UI elements
+            editTitle = (EditText) rootview.findViewById(R.id.edit_title);
+            editLabel = (EditText) rootview.findViewById(R.id.edit_label);
+            editDetails = (EditText) rootview.findViewById(R.id.edit_details);
+            dateButton = (Button) rootview.findViewById(R.id.date_selector);
+            timeButton = (Button) rootview.findViewById(R.id.time_selector);
+            prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
+            addReminderButton = (Button) rootview.findViewById(R.id.add_reminder_button);
+
+            setUpTimeSelector();
+            setUpDateSelector();
+//            setUpPrioritySpinner();
+            setUpAddReminderButton();
+
+            getPriorityIds();
+            populateFields(toDoItem);
+
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
+
         }
 
         /**
@@ -201,7 +245,7 @@ public class DetailActivity extends AppCompatActivity {
                     String priorityId = "";
 
                     // Only update if it's a freshly changed value
-                    if (!valueString.equals(item.priority)) {
+                    if (!valueString.equals(toDoItem.priority)) {
                         for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
                             int key = e.getKey();
                             String value = e.getValue();
@@ -229,11 +273,11 @@ public class DetailActivity extends AppCompatActivity {
                 public void onClick(View v) {
                     Intent intent = new Intent(Intent.ACTION_EDIT)
                             .setData(CalendarContract.Events.CONTENT_URI)
-                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, item.calTime.getTimeInMillis())
+                            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, toDoItem.calTime.getTimeInMillis())
                             .putExtra(CalendarContract.EXTRA_EVENT_ALL_DAY, false)
-                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, item.calTime.getTimeInMillis()+60*60*1000)
-                            .putExtra(CalendarContract.Events.TITLE, item.toDoTitle)
-                            .putExtra(CalendarContract.Events.DESCRIPTION, item.details);
+                            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, toDoItem.calTime.getTimeInMillis()+60*60*1000)
+                            .putExtra(CalendarContract.Events.TITLE, toDoItem.toDoTitle)
+                            .putExtra(CalendarContract.Events.DESCRIPTION, toDoItem.details);
                     startActivity(intent);
                 }
             });
@@ -288,7 +332,7 @@ public class DetailActivity extends AppCompatActivity {
             mValues.put(columnName, value);
 
             String wClause = "_id = ?";
-            String [] id = { Integer.toString(item.taskId) };
+            String [] id = { Integer.toString(toDoItem.taskId) };
 
             this.getContext().getContentResolver().update(
                     uri,
@@ -304,7 +348,6 @@ public class DetailActivity extends AppCompatActivity {
                     null,
                     null
             );
-            String hey = DatabaseUtils.dumpCursorToString(c);
         }
 
         private void insertTask(Uri uri, String columnName, String value) {

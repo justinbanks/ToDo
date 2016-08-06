@@ -19,17 +19,13 @@ import com.todo.group1.todo.data.ToDoContract;
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class TaskListAdapter extends CursorAdapter {
+
     public TaskListAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
     }
 
-    /*
-        This is ported from FetchWeatherTask --- but now we go straight from the cursor to the
-        string.
-     */
     private String convertCursorRowToUXFormat(Cursor cursor) {
         int idx_title = cursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE);
-
         return cursor.getString(idx_title);
     }
 
@@ -38,9 +34,7 @@ public class TaskListAdapter extends CursorAdapter {
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
-        View view = LayoutInflater.from(context).inflate(R.layout.list_item_task, parent, false);
-
-        return view;
+        return LayoutInflater.from(context).inflate(R.layout.list_item_task, parent, false);
     }
 
     /*
