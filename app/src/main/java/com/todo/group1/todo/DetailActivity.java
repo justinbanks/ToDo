@@ -14,6 +14,8 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -130,22 +132,6 @@ public class DetailActivity extends AppCompatActivity {
             MenuItem menuItemAdd = menu.findItem(R.id.action_complete);
         }
 
-        /**
-         * Configure the time selector. Set the onClickListener to a TimePickerFragment.
-         * And configure the default time shown.
-         */
-        public void setUpTimeSelector() {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat smp = new SimpleDateFormat("h:mm a", Locale.US);
-            timeButton.setText(smp.format(cal.getTime()));
-            timeButton.setOnClickListener(new View.OnClickListener(){
-                public void onClick(View v){
-                    DialogFragment newFragment = new TimePickerFragment();
-                    newFragment.show(getFragmentManager(), "timePicker");
-                }
-            });
-        }
-
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
@@ -155,7 +141,7 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Intent intent = getActivity().getIntent();
-            if (intent == null) {
+            if (intent == null || intent.getData() == null) {
                 return null;
             }
 
@@ -195,6 +181,9 @@ public class DetailActivity extends AppCompatActivity {
             prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
             addReminderButton = (Button) rootview.findViewById(R.id.add_reminder_button);
 
+            setUpEditTitle();
+            setUpEditLabel();
+            setUpEditDetails();
             setUpTimeSelector();
             setUpDateSelector();
             setUpPrioritySpinner();
@@ -207,6 +196,54 @@ public class DetailActivity extends AppCompatActivity {
 
         @Override
         public void onLoaderReset(Loader<Cursor> loader) { }
+
+        public void setUpEditTitle() {
+            editTitle.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                    Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    if (isNew) {
+                        // insert new item
+                    }
+                    else {
+                        // update it
+                    }
+                }
+            });
+        }
+
+        public void setUpEditLabel() {
+
+        }
+
+        public void setUpEditDetails() {
+
+        }
+
+        /**
+         * Configure the time selector. Set the onClickListener to a TimePickerFragment.
+         * And configure the default time shown.
+         */
+        public void setUpTimeSelector() {
+            Calendar cal = Calendar.getInstance();
+            SimpleDateFormat smp = new SimpleDateFormat("h:mm a", Locale.US);
+            timeButton.setText(smp.format(cal.getTime()));
+            timeButton.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    DialogFragment newFragment = new TimePickerFragment();
+                    newFragment.show(getFragmentManager(), "timePicker");
+                }
+            });
+        }
 
         /**
          * Configure the date selector. Set the onlickListener to the DatePickerFragment
