@@ -1,13 +1,13 @@
 package com.todo.group1.todo;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -24,8 +24,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 
 import com.todo.group1.todo.data.ToDoContract;
 
@@ -340,13 +342,25 @@ public class DetailActivity extends AppCompatActivity {
          * And configure the default time shown.
          */
         public void setUpTimeSelector() {
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat smp = new SimpleDateFormat("h:mm a", Locale.US);
+            final Calendar cal = Calendar.getInstance();
+            final SimpleDateFormat smp = new SimpleDateFormat("h:mm a", Locale.US);
             timeButton.setText(smp.format(cal.getTime()));
             timeButton.setOnClickListener(new View.OnClickListener(){
+                @Override
                 public void onClick(View v){
-                    DialogFragment newFragment = new TimePickerFragment();
-                    newFragment.show(getFragmentManager(), "timePicker");
+                    int hour = cal.get(Calendar.HOUR_OF_DAY);
+                    int minute = cal.get(Calendar.MINUTE);
+                    TimePickerDialog mTimePicker;
+                    mTimePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(TimePicker timePicker, int hour, int minute) {
+                            Calendar c = Calendar.getInstance();
+                            c.set(Calendar.HOUR_OF_DAY, hour);
+                            c.set(Calendar.MINUTE, minute);
+                            timeButton.setText(smp.format(c.getTime()));
+                        }
+                    }, hour, minute, false);
+                    mTimePicker.show();
                 }
             });
         }
@@ -357,14 +371,27 @@ public class DetailActivity extends AppCompatActivity {
          */
         public void setUpDateSelector() {
             // set up the date
-            Calendar cal = Calendar.getInstance();
-            SimpleDateFormat smp = new SimpleDateFormat("E, MMM d", Locale.US);
+            final Calendar cal = Calendar.getInstance();
+            final SimpleDateFormat smp = new SimpleDateFormat("E, MMM d", Locale.US);
             cal.add(Calendar.DAY_OF_MONTH, 1);
             dateButton.setText(smp.format(cal.getTime()));
             dateButton.setOnClickListener(new View.OnClickListener(){
                 public void onClick(View v) {
-                    DialogFragment newFragment = new DatePickerFragment();
-                    newFragment.show(getFragmentManager(), "datePicker");
+                    int year = cal.get(Calendar.YEAR);
+                    int month = cal.get(Calendar.MONTH);
+                    int day = cal.get(Calendar.DAY_OF_MONTH);
+                    DatePickerDialog mDatePicker;
+                    mDatePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker datePicker, int year, int month, int day) {
+                            Calendar c = Calendar.getInstance();
+                            c.set(Calendar.YEAR, year);
+                            c.set(Calendar.MONTH, month);
+                            c.set(Calendar.DAY_OF_MONTH, day);
+                            dateButton.setText(smp.format(c.getTime()));
+                        }
+                    }, year, month, day);
+                    mDatePicker.show();
                 }
             });
         }
@@ -490,16 +517,6 @@ public class DetailActivity extends AppCompatActivity {
                     wClause,
                     id
             );
-
-            Cursor cu = this.getContext().getContentResolver().query(
-                    ToDoContract.TaskEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            String don = DatabaseUtils.dumpCursorToString(cu);
-            int i = 0;
         }
 
         /**
