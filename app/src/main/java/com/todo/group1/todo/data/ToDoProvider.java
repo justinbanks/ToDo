@@ -30,7 +30,7 @@ public class ToDoProvider extends ContentProvider {
     static final int TASK_WITH_ID = 105;
 
     static final int LABEL = 300;
-    static final int LABELS_WITH_TASK = 301;
+    static final int LABEL_WITH_TITLE = 301;
     static final int LABEL_WITH_ID = 302;
 
     static final int PRIORITY = 500;
@@ -158,6 +158,7 @@ public class ToDoProvider extends ContentProvider {
         matcher.addURI(authority, ToDoContract.PATH_TASK + "/id/#", TASK_WITH_ID);
 
         matcher.addURI(authority, ToDoContract.PATH_LABEL, LABEL);
+        matcher.addURI(authority, ToDoContract.PATH_LABEL + "/title/*", LABEL_WITH_TITLE);
         matcher.addURI(authority, ToDoContract.PATH_LABEL + "/id/#", LABEL_WITH_ID);
 
         matcher.addURI(authority, ToDoContract.PATH_PRIORITY, PRIORITY);
@@ -190,6 +191,8 @@ public class ToDoProvider extends ContentProvider {
                 return ToDoContract.TaskEntry.CONTENT_ITEM_TYPE;
             case LABEL:
                 return ToDoContract.TaskLabel.CONTENT_TYPE;
+            case LABEL_WITH_TITLE:
+                return ToDoContract.TaskLabel.CONTENT_ITEM_TYPE;
             case LABEL_WITH_ID:
                 return ToDoContract.TaskLabel.CONTENT_ITEM_TYPE;
             case PRIORITY:
@@ -204,9 +207,7 @@ public class ToDoProvider extends ContentProvider {
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-        final int match = sUriMatcher.match(uri);
         Cursor retCursor;
-
         switch(sUriMatcher.match(uri)) {
             case TASKS:
             {
@@ -240,6 +241,21 @@ public class ToDoProvider extends ContentProvider {
             }
             case LABEL:
             {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        ToDoContract.TaskLabel.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+            case LABEL_WITH_TITLE:
+            {
+                selection = ToDoContract.TaskLabel.COLUMN_LABEL + " = ?";
+                selectionArgs = new String[] {ToDoContract.TaskLabel.getTitleFromUri(uri)};
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         ToDoContract.TaskLabel.TABLE_NAME,
                         projection,

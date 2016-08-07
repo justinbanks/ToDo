@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -48,6 +47,7 @@ public class MainActivity extends AppCompatActivity
     EditText input;
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity
         if (!prefs.getBoolean("firstTime", false)) {
             startUpTestData();
 
-            // mark first time has runned.
+            // mark first time ran
             SharedPreferences.Editor editor = prefs.edit();
             editor.putBoolean("firstTime", true);
             editor.apply();
@@ -96,7 +96,6 @@ public class MainActivity extends AppCompatActivity
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
         getSupportLoaderManager().initLoader(TASKLIST_LOADER, null, this);
 
-
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
         listview.setAdapter(mTaskListAdapter);
@@ -106,7 +105,6 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-                String curs = DatabaseUtils.dumpCursorToString(cursor);
                 int id = cursor.getInt(cursor.getColumnIndex(ToDoContract.TaskEntry._ID));
 
                 if (cursor != null) {

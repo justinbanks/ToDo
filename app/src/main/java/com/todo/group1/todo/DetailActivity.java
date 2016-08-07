@@ -3,6 +3,7 @@ package com.todo.group1.todo;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -14,8 +15,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -132,16 +131,30 @@ public class DetailActivity extends AppCompatActivity {
             MenuItem menuItemAdd = menu.findItem(R.id.action_complete);
         }
 
+        /**
+         * This function is run when the instance of the activity is launched.
+         * @param savedInstanceState Passed by the system.
+         */
         @Override
         public void onActivityCreated(Bundle savedInstanceState) {
             getLoaderManager().initLoader(DETAIL_LOADER, null, this);
             super.onActivityCreated(savedInstanceState);
         }
 
+        /**
+         * This function is run when the loader is initialized.
+         * It detects whether or not the task is new. It also sets up a CursorLoader to load
+         * the task's details.
+         * @param id passed by the system.
+         * @param args passed by the system.
+         * @return either a new CurserLoader or null if the task is new.
+         */
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Intent intent = getActivity().getIntent();
+            // If the intent is null, this is a new task
             if (intent == null || intent.getData() == null) {
+                isNew = true;
                 return null;
             }
 
@@ -155,10 +168,18 @@ public class DetailActivity extends AppCompatActivity {
             );
         }
 
+        /**
+         * Functions to be run when the loader is complete.
+         * Here we get ahold of our UI elements and populate them if necessary.
+         * @param loader passed by the system.
+         * @param data passed by the system. A cursor containing the data to be displayed.
+         */
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+            // If the cursor is null we don't want to parse data.
             if (!data.moveToFirst()) { return; }
 
+            // Find our data
             String title = data.getString(data.getColumnIndex(COLUMN_TITLE));
             String details = data.getString(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DETAIL));
             String label = data.getString(data.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
@@ -169,6 +190,7 @@ public class DetailActivity extends AppCompatActivity {
             int delete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
             boolean is_deleted = (delete != 0);
 
+            // Configure our toDoItem
             toDoItem = new ToDoItem(title, date, priority, details, label, is_complete, is_deleted);
             toDoItem.taskId = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry._ID));
 
@@ -181,6 +203,7 @@ public class DetailActivity extends AppCompatActivity {
             prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
             addReminderButton = (Button) rootview.findViewById(R.id.add_reminder_button);
 
+            // Set up the buttons and populate our fields
             setUpEditTitle();
             setUpEditLabel();
             setUpEditDetails();
@@ -194,39 +217,122 @@ public class DetailActivity extends AppCompatActivity {
 
         }
 
+        /**
+         * Tasks to be completed when the loader is reset.
+         * Required to be an implementation of LoaderCallbacks.
+         * @param loader passed by the system.
+         */
         @Override
         public void onLoaderReset(Loader<Cursor> loader) { }
 
+        /**
+         * Configure the title text editor.
+         */
         public void setUpEditTitle() {
-            editTitle.addTextChangedListener(new TextWatcher() {
+            editTitle.setOnFocusChangeListener(new View.OnFocusChangeListener() {
                 @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
+                public void onFocusChange(View view, boolean b) {
                     Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
                     if (isNew) {
                         // insert new item
                     }
                     else {
                         // update it
+                        String title = editTitle.getText().toString();
+                        updateTask(uri, ToDoContract.TaskEntry.COLUMN_TITLE, title);
                     }
                 }
             });
         }
 
+        /**
+         * Configure the label text editor.
+         */
         public void setUpEditLabel() {
+            editLabel.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    if (isNew) {
+                        // insert new item
+                    }
+                    else {
+                        // update it
+                        String label = editLabel.getText().toString();
+                        // search for the label in the databse
+                        String labelId = getLabelId(label);
+                        // labelId is null if the label wasn't found in the database
+                        if (labelId == null) {
+                            insertNewLabel(label);
+                            labelId = getLabelId(label);
+                        }
+                        // If labelId is still null there was a problem. Leave the old label.
+                        if (labelId != null)
+                            updateTask(uri, ToDoContract.TaskEntry.COLUMN_LABEL_ID, labelId);
+                    }
+                }
+            });
+        }
+
+        /**
+         * Retreive a labelId given a label.
+         * @param label the label being queried.
+         * @return A string containing the label ID, or null if the label does not exist.
+         */
+        public String getLabelId(String label) {
+            // We need to find out if that label already exists
+            Cursor labelCursor = getActivity().getContentResolver().query(
+                    ToDoContract.TaskLabel.buildLabelsWithTitle(label),
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            // If the label cursor is not null, an item was returned
+            if ((!labelCursor.moveToFirst()) || labelCursor.getCount() == 0) {
+                return null;
+            }
+            else {
+                // Get the label Id so we can insert it
+                String labelId = Integer.toString(labelCursor.getInt(
+                        labelCursor.getColumnIndex(ToDoContract.TaskLabel._ID)));
+                return labelId;
+            }
+        }
+
+        /**
+         * Insert a new label into the database.
+         * @param label the string to be inserted.
+         */
+        public void insertNewLabel(String label) {
+            ContentValues labelValues = new ContentValues();
+            labelValues.put(ToDoContract.TaskLabel.COLUMN_LABEL, label);
+            getActivity().getContentResolver().insert(
+                    ToDoContract.TaskLabel.CONTENT_URI,
+                    labelValues
+            );
 
         }
 
+        /**
+         * Configure the details text editor.
+         */
         public void setUpEditDetails() {
-
+            editDetails.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean b) {
+                    Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    if (isNew) {
+                        // insert new item
+                    }
+                    else {
+                        // update it
+                        String title = editDetails.getText().toString();
+                        updateTask(uri, ToDoContract.TaskEntry.COLUMN_DETAIL, title);
+                    }
+                }
+            });
         }
 
         /**
@@ -343,6 +449,9 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Set up a hashmap containing each priority Id and it's priority value.
+         */
         private void getPriorityIds() {
             Cursor priorityCursor = getContext().getContentResolver().query(
                     ToDoContract.TaskPriority.CONTENT_URI,
@@ -361,6 +470,12 @@ public class DetailActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * Update a task that has already been inserted.
+         * @param uri the uri containing the table to be operated on.
+         * @param columnName the column name that will be changed.
+         * @param value the value that will replace the old one.
+         */
         private void updateTask(Uri uri, String columnName, String value) {
             // Generate ContentValues and insert
             ContentValues mValues = new ContentValues();
@@ -375,8 +490,24 @@ public class DetailActivity extends AppCompatActivity {
                     wClause,
                     id
             );
+
+            Cursor cu = this.getContext().getContentResolver().query(
+                    ToDoContract.TaskEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            String don = DatabaseUtils.dumpCursorToString(cu);
+            int i = 0;
         }
 
+        /**
+         * Insert a new task into the database.
+         * @param uri the uri containing the table to be operated on.
+         * @param columnName the column name that will be changed.
+         * @param value the value that will replace the old one.
+         */
         private void insertTask(Uri uri, String columnName, String value) {
             // Generate ContentValues and insert
             // Get taskId
