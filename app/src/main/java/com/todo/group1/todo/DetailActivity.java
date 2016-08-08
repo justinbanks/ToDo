@@ -151,11 +151,15 @@ public class DetailActivity extends AppCompatActivity {
                 }
                 case R.id.action_complete:
                 {
-                    if (!isNew)
+                    if (!isNew) {
+                        String value = "0";
+                        if (!toDoItem.isComplete)
+                            value = "1";
                         updateTask(ToDoContract.TaskEntry.CONTENT_URI,
                                 ToDoContract.TaskEntry.COLUMN_IS_COMPLETED,
-                                "1"
+                                value
                         );
+                    }
                     NavUtils.navigateUpFromSameTask(getActivity());
                     break;
                 }
