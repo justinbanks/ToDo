@@ -1,14 +1,11 @@
 package com.todo.group1.todo;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -35,8 +32,6 @@ import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -71,17 +66,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!prefs.getBoolean("firstTime", false)) {
-            startUpTestData();
-
-            // mark first time ran
-            SharedPreferences.Editor editor = prefs.edit();
-            editor.putBoolean("firstTime", true);
-            editor.apply();
-        }
-
 
         // Set up our tasklist
         Cursor taskCursor = this.getContentResolver().query(
@@ -157,78 +141,6 @@ public class MainActivity extends AppCompatActivity
                                 hideKeyboard(v);
                         }
                     });
-    }
-
-    public void startUpTestData() {
-        this.getContentResolver().delete(
-                ToDoContract.TaskEntry.CONTENT_URI,
-                null,
-                null
-        );
-
-        this.getContentResolver().delete(
-                ToDoContract.TaskLabel.CONTENT_URI,
-                null,
-                null
-        );
-
-        ContentValues labelValues = new ContentValues();
-        labelValues.put(ToDoContract.TaskLabel.COLUMN_LABEL, "YEEEESSS");
-        this.getContentResolver().insert(ToDoContract.TaskLabel.CONTENT_URI, labelValues);
-
-        Cursor labelCursor = this.getContentResolver().query(
-                ToDoContract.TaskLabel.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-        int validLabelId = -1;
-        while (labelCursor.moveToNext()) {
-            validLabelId = labelCursor.getInt(
-                    labelCursor.getColumnIndex(ToDoContract.TaskLabel._ID));
-        }
-
-        // generating some test data
-        long currentTime = System.currentTimeMillis() + 1000000;
-        ContentValues testValues = new ContentValues();
-        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(COLUMN_TITLE, "Buy a plant");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
-
-        testValues = new ContentValues();
-        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(COLUMN_TITLE, "Catch some pokemon");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
-
-        testValues = new ContentValues();
-        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
-        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
-        testValues.put(COLUMN_TITLE, "HELP I'M STUCK IN A PHONE");
-        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
     }
 
     @Override

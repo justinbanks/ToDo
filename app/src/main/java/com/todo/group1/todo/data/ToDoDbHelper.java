@@ -59,6 +59,8 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
                 " (" + TaskPriority.COLUMN_PRIORITY + ") VALUES ('"
                 + mContext.getString(R.string.priority_high) + "');" ;
 
+        final String SQL_INSERT_LABEL_BLANK = "INSERT INTO " + TaskLabel.TABLE_NAME +
+                " (" + TaskLabel.COLUMN_LABEL + ") VALUES ('');" ;
 
         // Create a table to hold our tasks
         final String SQL_CREATE_TASK_TABLE = "CREATE TABLE " + TaskEntry.TABLE_NAME + " (" +
@@ -88,12 +90,13 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_LOW);
         sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_MED);
         sqLiteDatabase.execSQL(SQL_INSERT_PRIORITY_HIGH);
+        sqLiteDatabase.execSQL(SQL_INSERT_LABEL_BLANK);
         sqLiteDatabase.execSQL(SQL_CREATE_TASK_TABLE);
     }
 
     // this function to be implemented if DATABASE_VERSION is incremented (i.e. if schema changes)
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-
+        onCreate(sqLiteDatabase);
     }
 }

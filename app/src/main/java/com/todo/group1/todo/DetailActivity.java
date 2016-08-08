@@ -573,6 +573,21 @@ public class DetailActivity extends AppCompatActivity {
                 return;
             if (!insertValues.containsKey(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED))
                 insertValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+
+            if (!insertValues.containsKey(ToDoContract.TaskEntry.COLUMN_LABEL_ID))
+                insertValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
+
+            // Insert a default priority ID of None if it isn't populated
+            if (!insertValues.containsKey(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID)) {
+                for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
+                    int key = e.getKey();
+                    String value = e.getValue();
+                    if (value.equals(getString(R.string.priority_none))) {
+                        String priorityId = Integer.toString(key);
+                        insertValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
+                    }
+                }
+            }
             insertValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
             insertValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, System.currentTimeMillis());
 
@@ -586,15 +601,6 @@ public class DetailActivity extends AppCompatActivity {
             // Set isNew to F
             isNew = false;
             insertValues.clear();
-
-            Cursor c = this.getContext().getContentResolver().query(
-                    ToDoContract.TaskEntry.CONTENT_URI,
-                    null,
-                    null,
-                    null,
-                    null
-            );
-            String i = DatabaseUtils.dumpCursorToString(c);
         }
     }
 }

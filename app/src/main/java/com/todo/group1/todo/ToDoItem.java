@@ -23,11 +23,11 @@ public class ToDoItem implements Serializable{
 
     public ToDoItem(String toDoTitle, long dateInMs, String priority, String details, String label,
                     boolean is_complete, boolean isDeleted){
-        this.toDoTitle = toDoTitle;
+        this.toDoTitle = (toDoTitle == null) ? "" : toDoTitle;
         this.dateInMs = dateInMs;
-        this.priority = priority;
-        this.details = details;
-        this.label = label;
+        this.priority = (priority == null) ? "" : priority;
+        this.details = (details == null) ? "" : details;
+        this.label = (label == null) ? "" : label;
         this.isComplete = is_complete;
         this.isDeleted = isDeleted;
 
