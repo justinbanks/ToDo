@@ -108,7 +108,7 @@ public class ToDoProvider extends ContentProvider {
         String selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS,
                 selection,
                 selectionArgs,
                 null,
@@ -121,7 +121,7 @@ public class ToDoProvider extends ContentProvider {
         // 1 means the task is marked complete
         String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS,
                 selection,
                 null,
                 null,
@@ -135,7 +135,7 @@ public class ToDoProvider extends ContentProvider {
                 ToDoContract.TaskEntry._ID + " = ?";
         String [] selectionArgs = new String [] { ToDoContract.TaskEntry.getTaskIdFromUri(uri) };
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                projection,
+                TASK_COLUMNS,
                 selection,
                 selectionArgs,
                 null,

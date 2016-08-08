@@ -19,7 +19,7 @@ public class ToDoItem implements Serializable{
     public String label = "";
     public boolean isComplete = false;
     public boolean isDeleted = false;
-    public int taskId;
+    public int taskId = 0;
 
     public ToDoItem(String toDoTitle, long dateInMs, String priority, String details, String label,
                     boolean is_complete, boolean isDeleted){
@@ -33,9 +33,7 @@ public class ToDoItem implements Serializable{
 
         this.configureTime();
     }
-    public ToDoItem (String toDoTitle) {
-        this.toDoTitle = toDoTitle;
-    }
+    public ToDoItem () {}
 
     /**
      * ToString is overridden here in order to use a ToDoItem with an ArrayAdapter. This enables

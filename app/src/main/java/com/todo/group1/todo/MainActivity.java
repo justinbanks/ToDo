@@ -154,9 +154,7 @@ public class MainActivity extends AppCompatActivity
                         @Override
                        public void onFocusChange(View v, boolean hasFocus) {
                             if (!hasFocus)
-                            {
                                 hideKeyboard(v);
-                            }
                         }
                     });
     }
@@ -204,6 +202,32 @@ public class MainActivity extends AppCompatActivity
         testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
         testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
         testValues.put(COLUMN_TITLE, "Buy a plant");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        testValues = new ContentValues();
+        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues.put(COLUMN_TITLE, "Catch some pokemon");
+        this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
+
+        testValues = new ContentValues();
+        testValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, validLabelId);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 2);
+        testValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        testValues.put(COLUMN_TITLE, "HELP I'M STUCK IN A PHONE");
         this.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
     }
 
@@ -287,7 +311,6 @@ public class MainActivity extends AppCompatActivity
         // Set the listview adapter
 
         // This opens the detail view when a list item is clicked
-
     }
 
     private void setHighPriorityTasksList() {
@@ -305,7 +328,6 @@ public class MainActivity extends AppCompatActivity
         // Set the listview adapter
 
         // This opens the detail view when a list item is clicked
-
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

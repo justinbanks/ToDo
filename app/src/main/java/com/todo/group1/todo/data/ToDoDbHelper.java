@@ -69,9 +69,9 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
                 TaskEntry.COLUMN_DETAIL + " TEXT," +
                 TaskEntry.COLUMN_IS_COMPLETED + " INTEGER NOT NULL," +
                 TaskEntry.COLUMN_IS_DELETED + " INTEGER NOT NULL," +
-                TaskEntry.COLUMN_REMINDER_ADDED + " INTEGER NOT NULL," +
-                TaskEntry.COLUMN_LABEL_ID + " INTEGER NOT NULL," +
-                TaskEntry.COLUMN_PRIORITY_ID + " INTEGER NOT NULL," +
+                TaskEntry.COLUMN_REMINDER_ADDED + " INTEGER," +
+                TaskEntry.COLUMN_LABEL_ID + " INTEGER," +
+                TaskEntry.COLUMN_PRIORITY_ID + " INTEGER," +
                 TaskEntry.COLUMN_PARENT_TASK_ID + " INTEGER," +
 
                 // Set up the priority column as a foreign key to the priority table

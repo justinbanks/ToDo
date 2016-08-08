@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -84,10 +85,10 @@ public class DetailActivity extends AppCompatActivity {
         private static final int DETAIL_LOADER = 0;
 
         private final Calendar c = Calendar.getInstance();
-
         private View rootview;
         private ToDoItem toDoItem;
         private boolean isNew;
+        private ContentValues insertValues = new ContentValues();
 
         // find our UI elements
         private EditText editTitle;
@@ -100,9 +101,6 @@ public class DetailActivity extends AppCompatActivity {
 
         // Maps priority IDs to strings
         private Map<Integer, String> priorityMap;
-
-        // ContentValues that will later be inserted into db
-        ContentValues values = new ContentValues();
 
         public DetailFragment() {
             setHasOptionsMenu(true);
@@ -156,10 +154,19 @@ public class DetailActivity extends AppCompatActivity {
         @Override
         public Loader<Cursor> onCreateLoader(int id, Bundle args) {
             Intent intent = getActivity().getIntent();
+            isNew = false;
             // If the intent is null, this is a new task
             if (intent == null || intent.getData() == null) {
                 isNew = true;
-                return null;
+                return new CursorLoader(
+                        getActivity(),
+                        // This creates a null cursor as there is never a task with ID 0
+                        ToDoContract.TaskEntry.buildTaskWithId("0"),
+                        null,
+                        null,
+                        null,
+                        null
+                );
             }
 
             return new CursorLoader(
@@ -180,24 +187,6 @@ public class DetailActivity extends AppCompatActivity {
          */
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-            // If the cursor is null we don't want to parse data.
-            if (!data.moveToFirst()) { return; }
-
-            // Find our data
-            String title = data.getString(data.getColumnIndex(COLUMN_TITLE));
-            String details = data.getString(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DETAIL));
-            String label = data.getString(data.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
-            long date = data.getLong(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
-            String priority = data.getString(data.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
-            int complete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
-            boolean is_complete = (complete != 0);
-            int delete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
-            boolean is_deleted = (delete != 0);
-
-            // Configure our toDoItem
-            toDoItem = new ToDoItem(title, date, priority, details, label, is_complete, is_deleted);
-            toDoItem.taskId = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry._ID));
-
             // find our UI elements
             editTitle = (EditText) rootview.findViewById(R.id.edit_title);
             editLabel = (EditText) rootview.findViewById(R.id.edit_label);
@@ -206,6 +195,28 @@ public class DetailActivity extends AppCompatActivity {
             timeButton = (Button) rootview.findViewById(R.id.time_selector);
             prioritySpinner = (Spinner) rootview.findViewById(R.id.priority_spinner);
             addReminderButton = (Button) rootview.findViewById(R.id.add_reminder_button);
+
+            if (!isNew && data.moveToFirst()) {
+                // Find our data
+                String title = data.getString(data.getColumnIndex(COLUMN_TITLE));
+                String details = data.getString(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DETAIL));
+                String label = data.getString(data.getColumnIndex(ToDoContract.TaskLabel.COLUMN_LABEL));
+                long date = data.getLong(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_DUE_DATE));
+                String priority = data.getString(data.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
+                int complete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED));
+                boolean is_complete = (complete != 0);
+                int delete = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry.COLUMN_IS_DELETED));
+                boolean is_deleted = (delete != 0);
+
+                // Configure our toDoItem
+                toDoItem = new ToDoItem(title, date, priority, details, label, is_complete, is_deleted);
+
+                String c = DatabaseUtils.dumpCursorToString(data);
+
+                toDoItem.taskId = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry._ID));
+            }
+            else
+                toDoItem = new ToDoItem();
 
             // Set up the buttons and populate our fields
             setUpEditTitle();
@@ -218,7 +229,6 @@ public class DetailActivity extends AppCompatActivity {
 
             getPriorityIds();
             populateFields(toDoItem);
-
         }
 
         /**
@@ -237,14 +247,14 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    String title = editTitle.getText().toString();
                     if (isNew) {
-                        // insert new item
+                        insertValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, title);
+                        // The task only gets inserted if there is a title
+                        insertTask(uri);
                     }
-                    else {
-                        // update it
-                        String title = editTitle.getText().toString();
+                    else
                         updateTask(uri, ToDoContract.TaskEntry.COLUMN_TITLE, title);
-                    }
                 }
             });
         }
@@ -257,21 +267,20 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
-                    if (isNew) {
-                        // insert new item
+                    String label = editLabel.getText().toString();
+                    // search for the label in the databse
+                    String labelId = getLabelId(label);
+                    // labelId is null if the label wasn't found in the database
+                    if (labelId == null) {
+                        insertNewLabel(label);
+                        labelId = getLabelId(label);
                     }
-                    else {
-                        // update it
-                        String label = editLabel.getText().toString();
-                        // search for the label in the databse
-                        String labelId = getLabelId(label);
-                        // labelId is null if the label wasn't found in the database
-                        if (labelId == null) {
-                            insertNewLabel(label);
-                            labelId = getLabelId(label);
-                        }
-                        // If labelId is still null there was a problem. Leave the old label.
-                        if (labelId != null)
+
+                    // If labelId is still null there was a problem. Leave the old label.
+                    if (labelId != null) {
+                        if (isNew)
+                            insertValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, labelId);
+                        else
                             updateTask(uri, ToDoContract.TaskEntry.COLUMN_LABEL_ID, labelId);
                     }
                 }
@@ -284,6 +293,8 @@ public class DetailActivity extends AppCompatActivity {
          * @return A string containing the label ID, or null if the label does not exist.
          */
         public String getLabelId(String label) {
+            if (label.equals("")) return null;
+
             // We need to find out if that label already exists
             Cursor labelCursor = getActivity().getContentResolver().query(
                     ToDoContract.TaskLabel.buildLabelsWithTitle(label),
@@ -327,13 +338,12 @@ public class DetailActivity extends AppCompatActivity {
                 @Override
                 public void onFocusChange(View view, boolean b) {
                     Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                    String details = editDetails.getText().toString();
                     if (isNew) {
-                        // insert new item
+                        insertValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, details);
                     }
                     else {
-                        // update it
-                        String title = editDetails.getText().toString();
-                        updateTask(uri, ToDoContract.TaskEntry.COLUMN_DETAIL, title);
+                        updateTask(uri, ToDoContract.TaskEntry.COLUMN_DETAIL, details);
                     }
                 }
             });
@@ -360,7 +370,11 @@ public class DetailActivity extends AppCompatActivity {
                             c.set(Calendar.MINUTE, minute);
                             timeButton.setText(smp.format(c.getTime()));
                             Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
-                            updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
+                            if (isNew)
+                                insertValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
+                            else
+                                updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
+
                         }
                     }, hour, minute, false);
                     mTimePicker.show();
@@ -392,7 +406,11 @@ public class DetailActivity extends AppCompatActivity {
                             c.set(Calendar.DAY_OF_MONTH, day);
                             dateButton.setText(smp.format(c.getTime()));
                             Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
-                            updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
+                            if (isNew) {
+                                insertValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
+                            }
+                            else
+                                updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
                         }
                     }, year, month, day);
                     mDatePicker.show();
@@ -425,7 +443,7 @@ public class DetailActivity extends AppCompatActivity {
                                 priorityId = Integer.toString(key);
                         }
                         if (isNew)
-                            insertTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
+                            insertValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
                         else
                             updateTask(uri, ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, priorityId);
                     }
@@ -548,14 +566,35 @@ public class DetailActivity extends AppCompatActivity {
         /**
          * Insert a new task into the database.
          * @param uri the uri containing the table to be operated on.
-         * @param columnName the column name that will be changed.
-         * @param value the value that will replace the old one.
          */
-        private void insertTask(Uri uri, String columnName, String value) {
-            // Generate ContentValues and insert
+        private void insertTask(Uri uri) {
+            // Make sure our NOT NULL constraints are satisfied
+            if (insertValues.getAsString(ToDoContract.TaskEntry.COLUMN_TITLE).equals(""))
+                return;
+            if (!insertValues.containsKey(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED))
+                insertValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
+            insertValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+            insertValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, System.currentTimeMillis());
+
+            Uri newTask = this.getContext().getContentResolver().insert(
+                    uri,
+                    insertValues
+            );
+
             // Get taskId
-            // Set to do item's task id
+            toDoItem.taskId = Integer.parseInt(newTask.getPathSegments().get(1));
             // Set isNew to F
+            isNew = false;
+            insertValues.clear();
+
+            Cursor c = this.getContext().getContentResolver().query(
+                    ToDoContract.TaskEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+            String i = DatabaseUtils.dumpCursorToString(c);
         }
     }
 }
