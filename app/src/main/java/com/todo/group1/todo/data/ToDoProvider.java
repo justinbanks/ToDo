@@ -68,10 +68,12 @@ public class ToDoProvider extends ContentProvider {
     }
 
     private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] { "0" };
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                null,
-                null,
+                selection,
+                selectionArgs,
                 null,
                 null,
                 sortOrder
@@ -79,8 +81,9 @@ public class ToDoProvider extends ContentProvider {
     }
 
     private Cursor getTasksWithPriority(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
+        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ? AND " +
+                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri), "0"};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
                 selection,
@@ -92,8 +95,9 @@ public class ToDoProvider extends ContentProvider {
     }
 
     private Cursor getTasksBeforeDate(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
+        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri), "0"};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
                 selection,

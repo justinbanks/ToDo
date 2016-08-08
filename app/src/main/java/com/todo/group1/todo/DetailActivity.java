@@ -139,6 +139,14 @@ public class DetailActivity extends AppCompatActivity {
             switch (item.getItemId()) {
                 case R.id.action_delete:
                 {
+                    String [] taskId = new String [] {Integer.toString(toDoItem.taskId)};
+                    if (!isNew && toDoItem.taskId != 0)
+                        this.getContext().getContentResolver().delete(
+                                ToDoContract.TaskEntry.CONTENT_URI,
+                                ToDoContract.TaskEntry._ID + " = ? ",
+                                taskId
+                        );
+                    NavUtils.navigateUpFromSameTask(getActivity());
                     break;
                 }
                 case R.id.action_complete:
@@ -148,6 +156,7 @@ public class DetailActivity extends AppCompatActivity {
                                 ToDoContract.TaskEntry.COLUMN_IS_COMPLETED,
                                 "1"
                         );
+                    NavUtils.navigateUpFromSameTask(getActivity());
                     break;
                 }
             }
