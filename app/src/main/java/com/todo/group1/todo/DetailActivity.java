@@ -98,6 +98,8 @@ public class DetailActivity extends AppCompatActivity {
         private Button timeButton;
         private Spinner prioritySpinner;
         private Button addReminderButton;
+        private MenuItem menuItemDelete;
+        private MenuItem menuItemComplete;
 
         // Maps priority IDs to strings
         private Map<Integer, String> priorityMap;
@@ -129,8 +131,8 @@ public class DetailActivity extends AppCompatActivity {
             super.onCreateOptionsMenu(menu, inflater);
             inflater.inflate(R.menu.detailfragment, menu);
 
-            MenuItem menuItemDelete = menu.findItem(R.id.action_delete);
-            MenuItem menuItemAdd = menu.findItem(R.id.action_complete);
+            menuItemDelete = menu.findItem(R.id.action_delete);
+            menuItemComplete = menu.findItem(R.id.action_complete);
         }
 
         /**
