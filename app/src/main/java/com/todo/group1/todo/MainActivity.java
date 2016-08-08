@@ -213,16 +213,22 @@ public class MainActivity extends AppCompatActivity
         Uri uri = ToDoContract.TaskEntry.buildTaskAfterDate(date);
 
         // Query the database
-
-        // Convert the cursor to ToDoItem
-
-        // Attach the task list adapter to the list view
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
 
         // Set up the task list adapter
+        mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        // attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
 
         // Set the listview adapter
-
-        // This opens the detail view when a list item is clicked
+        listview.setAdapter(mTaskListAdapter);
     }
 
     private void setHighPriorityTasksList() {
@@ -230,16 +236,22 @@ public class MainActivity extends AppCompatActivity
         Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(getString(R.string.priority_high));
 
         // Query the database
-
-        // Convert the cursor to ToDoItem
-
-        // Attach the task list adapter to the list view
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
 
         // Set up the task list adapter
+        mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        // attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
 
         // Set the listview adapter
-
-        // This opens the detail view when a list item is clicked
+        listview.setAdapter(mTaskListAdapter);
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
