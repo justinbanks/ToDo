@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -68,6 +69,15 @@ public class ToDoProvider extends ContentProvider {
     }
 
     private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
+        Cursor c = sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                TASK_COLUMNS,
+                null,
+                null,
+                null,
+                null,
+                sortOrder
+        );
+        String i = DatabaseUtils.dumpCursorToString(c);
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
                 null,

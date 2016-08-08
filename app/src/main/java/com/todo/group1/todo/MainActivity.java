@@ -3,9 +3,12 @@ package com.todo.group1.todo;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -38,6 +41,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView.OnNavigationItemSelectedListener {
 
     private static final int TASKLIST_LOADER = 0;
+   // private String defaultOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
+    private String sortOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";;
     private TaskListAdapter mTaskListAdapter;
     EditText input;
 
@@ -48,7 +53,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        defaultSort();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -99,17 +104,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        // Set up the search bar
-        input = (EditText) findViewById(R.id.inputSearch);
-        listview.setTextFilterEnabled(true);
-
-        // Search data change detection
-//        Collections.sort(taskList, new Comparator<ToDoItem>() {
-//            @Override
-//            public int compare(ToDoItem t0, ToDoItem t1) {
-//                return -t0.toString().compareToIgnoreCase(t1.toString());
-//            }
-//        });
 
         //updates listview when input is put into the search bar
         input = (EditText) findViewById(R.id.inputSearch);
@@ -166,7 +160,7 @@ public class MainActivity extends AppCompatActivity
                 null,
                 null,
                 null,
-                null
+                defaultSort()
         );
     }
 
@@ -295,5 +289,23 @@ public class MainActivity extends AppCompatActivity
     public void openDialog(MenuItem item) {
         DialogFragment newFragment = SortDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), "dialog");
+    }
+
+    public String defaultSort()
+    {
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
+        String which = sp.getString("sort_list", "");
+
+        switch (which){
+            case "1":
+                return ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " ASC";
+            case "0":
+                return ToDoContract.TaskEntry.COLUMN_DUE_DATE + " ASC";
+            case "-1":
+                return ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
+
+            default:
+                return ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
+        }
     }
 }
