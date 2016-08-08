@@ -83,6 +83,8 @@ public class DetailActivity extends AppCompatActivity {
         private static final String LOG_TAG = DetailFragment.class.getSimpleName();
         private static final int DETAIL_LOADER = 0;
 
+        private final Calendar c = Calendar.getInstance();
+
         private View rootview;
         private ToDoItem toDoItem;
         private boolean isNew;
@@ -338,8 +340,8 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /**
-         * Configure the time selector. Set the onClickListener to a TimePickerFragment.
-         * And configure the default time shown.
+         * Configure the time selector. Set the onClickListener to a new dialog
+         * and configure the default time shown.
          */
         public void setUpTimeSelector() {
             final Calendar cal = Calendar.getInstance();
@@ -354,10 +356,11 @@ public class DetailActivity extends AppCompatActivity {
                     mTimePicker = new TimePickerDialog(getContext(), new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker timePicker, int hour, int minute) {
-                            Calendar c = Calendar.getInstance();
                             c.set(Calendar.HOUR_OF_DAY, hour);
                             c.set(Calendar.MINUTE, minute);
                             timeButton.setText(smp.format(c.getTime()));
+                            Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                            updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
                         }
                     }, hour, minute, false);
                     mTimePicker.show();
@@ -366,7 +369,7 @@ public class DetailActivity extends AppCompatActivity {
         }
 
         /**
-         * Configure the date selector. Set the onlickListener to the DatePickerFragment
+         * Configure the date selector. Set the onlickListener to a new dialog
          * and configure the default date shown.
          */
         public void setUpDateSelector() {
@@ -384,11 +387,12 @@ public class DetailActivity extends AppCompatActivity {
                     mDatePicker = new DatePickerDialog(getContext(), new DatePickerDialog.OnDateSetListener() {
                         @Override
                         public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                            Calendar c = Calendar.getInstance();
                             c.set(Calendar.YEAR, year);
                             c.set(Calendar.MONTH, month);
                             c.set(Calendar.DAY_OF_MONTH, day);
                             dateButton.setText(smp.format(c.getTime()));
+                            Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+                            updateTaskWithLong(uri, ToDoContract.TaskEntry.COLUMN_DUE_DATE, c.getTimeInMillis());
                         }
                     }, year, month, day);
                     mDatePicker.show();
@@ -504,6 +508,28 @@ public class DetailActivity extends AppCompatActivity {
          * @param value the value that will replace the old one.
          */
         private void updateTask(Uri uri, String columnName, String value) {
+            // Generate ContentValues and insert
+            ContentValues mValues = new ContentValues();
+            mValues.put(columnName, value);
+
+            String wClause = "_id = ?";
+            String [] id = { Integer.toString(toDoItem.taskId) };
+
+            this.getContext().getContentResolver().update(
+                    uri,
+                    mValues,
+                    wClause,
+                    id
+            );
+        }
+
+        /**
+         * Update a task that has already been inserted.
+         * @param uri the uri containing the table to be operated on.
+         * @param columnName the column name that will be changed.
+         * @param value the value that will replace the old one.
+         */
+        private void updateTaskWithLong(Uri uri, String columnName, Long value) {
             // Generate ContentValues and insert
             ContentValues mValues = new ContentValues();
             mValues.put(columnName, value);
