@@ -4,7 +4,6 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
@@ -69,28 +68,8 @@ public class ToDoProvider extends ContentProvider {
     }
 
     private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
-        Cursor c = sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                TASK_COLUMNS,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
-        );
-        String i = DatabaseUtils.dumpCursorToString(c);
-        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
-                TASK_COLUMNS,
-                null,
-                null,
-                null,
-                null,
-                sortOrder
-        );
-    }
-
-    private Cursor getTasksWithPriority(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri)};
+        String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] { "0" };
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
                 selection,
@@ -101,9 +80,24 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
-    private Cursor getTasksAfterDate(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
+    private Cursor getTasksWithPriority(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ? AND " +
+                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri), "0"};
+        return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
+                TASK_COLUMNS,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getTasksBeforeDate(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri), "0"};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
                 selection,
@@ -231,7 +225,7 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_AFTER_DATE:
             {
-                retCursor = getTasksAfterDate(uri, projection, sortOrder);
+                retCursor = getTasksBeforeDate(uri, projection, sortOrder);
                 break;
             }
             case TASKS_WITH_LABEL:

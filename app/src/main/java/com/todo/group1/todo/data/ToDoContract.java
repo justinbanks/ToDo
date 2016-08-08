@@ -76,7 +76,7 @@ public class ToDoContract {
             return uri.getPathSegments().get(2);
         }
 
-        public static Uri buildTaskAfterDate(Date date) {
+        public static Uri buildTaskBeforeDate(Date date) {
             // date format needs to be in milliseconds since epoch
             long milliseconds = date.getTime();
             String str_date = String.valueOf(milliseconds);

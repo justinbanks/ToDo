@@ -130,7 +130,7 @@ public class TestProvider {
 
         // Test content provider query
         Cursor taskCursor = mContext.getContentResolver().query(
-                ToDoContract.TaskEntry.buildTaskAfterDate(date),
+                ToDoContract.TaskEntry.buildTaskBeforeDate(date),
                 null,
                 null,
                 null,
