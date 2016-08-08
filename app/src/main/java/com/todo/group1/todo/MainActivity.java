@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -32,6 +33,8 @@ import com.todo.group1.todo.data.ToDoContract;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>,
@@ -210,7 +213,7 @@ public class MainActivity extends AppCompatActivity
         // get dates after tomorrow
         cal.add(Calendar.DAY_OF_MONTH, 1);
         Date date = cal.getTime();
-        Uri uri = ToDoContract.TaskEntry.buildTaskAfterDate(date);
+        Uri uri = ToDoContract.TaskEntry.buildTaskBeforeDate(date);
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -232,8 +235,58 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setHighPriorityTasksList() {
+        Cursor priorityCursor = this.getContentResolver().query(
+                ToDoContract.TaskPriority.CONTENT_URI,
+                null,
+                null,
+                null,
+                null
+        );
+        Map <Integer, String> priorityMap = new HashMap<>();
+        while (priorityCursor.moveToNext()) {
+            String prString = priorityCursor.getString(
+                    priorityCursor.getColumnIndex(ToDoContract.TaskPriority.COLUMN_PRIORITY));
+            int prId = priorityCursor.getInt(
+                    priorityCursor.getColumnIndex(ToDoContract.TaskPriority._ID));
+            priorityMap.put(prId, prString);
+        }
+
+        String priorityId = "0";
+        for (Map.Entry<Integer, String> e : priorityMap.entrySet()) {
+            int key = e.getKey();
+            String value = e.getValue();
+            if (value.equals(getString(R.string.priority_high)))
+                priorityId = Integer.toString(key);
+        }
+
         // Build the Uri
-        Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(getString(R.string.priority_high));
+        Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(priorityId);
+
+        // Query the database
+        Cursor taskCursor = this.getContentResolver().query(
+                uri,
+                null,
+                null,
+                null,
+                null
+        );
+
+        String i = DatabaseUtils.dumpCursorToString(taskCursor);
+
+
+        // Set up the task list adapter
+        mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        // attach the task list adapter to the list view
+        ListView listview = (ListView) findViewById(R.id.listview_tasklist);
+
+        // Set the listview adapter
+        listview.setAdapter(mTaskListAdapter);
+    }
+
+    private void setAllTasksList() {
+        // Build the Uri
+        Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -266,6 +319,8 @@ public class MainActivity extends AppCompatActivity
             setUpcomingTasksList();
         } else if (id == R.id.high_priority_tasks) {
             setHighPriorityTasksList();
+        } else if (id == R.id.all_tasks) {
+            setAllTasksList();
         } else if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
         }

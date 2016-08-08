@@ -5,6 +5,9 @@
         android:checkableBehavior="single"
         android:id="@+id/menu_upper">
         <item
+            android:id="@+id/all_tasks"
+            android:title="@string/nav_all_tasks" />
+        <item
             android:id="@+id/high_priority_tasks"
             android:title="@string/nav_high_priority" />
         <item

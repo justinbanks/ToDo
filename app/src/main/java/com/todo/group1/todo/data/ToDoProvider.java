@@ -91,8 +91,8 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
-    private Cursor getTasksAfterDate(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " >= ?";
+    private Cursor getTasksBeforeDate(Uri uri, String [] projection, String sortOrder) {
+        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ?";
         String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri)};
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
@@ -221,7 +221,7 @@ public class ToDoProvider extends ContentProvider {
             }
             case TASKS_AFTER_DATE:
             {
-                retCursor = getTasksAfterDate(uri, projection, sortOrder);
+                retCursor = getTasksBeforeDate(uri, projection, sortOrder);
                 break;
             }
             case TASKS_WITH_LABEL:

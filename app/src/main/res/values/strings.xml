@@ -11,6 +11,7 @@
     <string name="nav_complete_tasks">Completed</string>
     <string name="nav_upcoming_tasks">Upcoming</string>
     <string name="nav_high_priority">High Priority</string>
+    <string name="nav_all_tasks">All Tasks</string>
     <string name="nav_settings">@string/action_settings</string>
 
     <!-- Strings for priority -->
