@@ -5,7 +5,6 @@ import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CalendarContract;
@@ -135,6 +134,27 @@ public class DetailActivity extends AppCompatActivity {
             menuItemComplete = menu.findItem(R.id.action_complete);
         }
 
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            switch (item.getItemId()) {
+                case R.id.action_delete:
+                {
+                    break;
+                }
+                case R.id.action_complete:
+                {
+                    if (!isNew)
+                        updateTask(ToDoContract.TaskEntry.CONTENT_URI,
+                                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED,
+                                "1"
+                        );
+                    break;
+                }
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+
         /**
          * This function is run when the instance of the activity is launched.
          * @param savedInstanceState Passed by the system.
@@ -212,12 +232,9 @@ public class DetailActivity extends AppCompatActivity {
 
                 // Configure our toDoItem
                 toDoItem = new ToDoItem(title, date, priority, details, label, is_complete, is_deleted);
-
-                String c = DatabaseUtils.dumpCursorToString(data);
-
                 toDoItem.taskId = data.getInt(data.getColumnIndex(ToDoContract.TaskEntry._ID));
             }
-            else
+            else if (toDoItem == null)
                 toDoItem = new ToDoItem();
 
             // Set up the buttons and populate our fields
