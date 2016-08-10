@@ -37,8 +37,11 @@ public class TestUtilities {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
-            if (!valueCursor.getString(idx).equals("")) {
-                assertEquals("Value '" + entry.getValue().toString() +
+            String actualValue = valueCursor.getString(idx);
+            if (!valueCursor.getString(idx).equals("") &&
+                    !columnName.equals(ToDoContract.TaskEntry.COLUMN_CREATE_DATE) &&
+                    !columnName.equals(ToDoContract.TaskEntry.COLUMN_DUE_DATE)) {
+                assertEquals("Value '" + valueCursor.getString(idx) +
                         "' did not match the expected value '" +
                         expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
             }
@@ -60,9 +63,22 @@ public class TestUtilities {
         taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
-        taskValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 1);
-        taskValues.put(ToDoContract.TaskEntry.COLUMN_REMINDER_ADDED, 0);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
+
+        return taskValues;
+    }
+
+    // This function generates a ContentValue task entry
+    static ContentValues createTaskEntryValuesMarkedComplete() {
+        ContentValues taskValues = new ContentValues();
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_PRIORITY_ID, 1);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, "Buy a plant");
 
         return taskValues;
@@ -86,6 +102,21 @@ public class TestUtilities {
         ToDoDbHelper dbHelper = new ToDoDbHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         ContentValues testValues = TestUtilities.createTaskEntryValues();
+
+        long taskRowId;
+        taskRowId = db.insert(ToDoContract.TaskEntry.TABLE_NAME, null, testValues);
+
+        // Verify we got a row back.
+        assertTrue("Error: Failure to insert Task Entry Values", taskRowId != -1);
+
+        return taskRowId;
+    }
+
+    static long insertTaskEntryValuesMarkedComplete(Context context) {
+        // insert our test records into the database
+        ToDoDbHelper dbHelper = new ToDoDbHelper(context);
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        ContentValues testValues = TestUtilities.createTaskEntryValuesMarkedComplete();
 
         long taskRowId;
         taskRowId = db.insert(ToDoContract.TaskEntry.TABLE_NAME, null, testValues);

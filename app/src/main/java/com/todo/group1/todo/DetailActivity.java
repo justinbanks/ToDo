@@ -285,6 +285,8 @@ public class DetailActivity extends AppCompatActivity {
                 public void onFocusChange(View view, boolean b) {
                     Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
                     String title = editTitle.getText().toString();
+                    if (title.equals("")) return;
+
                     if (isNew) {
                         insertValues.put(ToDoContract.TaskEntry.COLUMN_TITLE, title);
                         // The task only gets inserted if there is a title
