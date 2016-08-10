@@ -25,14 +25,12 @@ public class SortDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final String tempSort = MainActivity.sortOrder;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.toolbar_sort_title)
-                .setSingleChoiceItems(R.array.pref_sort_list_titles, 0, new DialogInterface.OnClickListener() {
+                .setItems(R.array.pref_sort_list_titles, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-
                         if( which == 0)
                         {
                             Log.d("debug", "priority");
@@ -47,30 +45,10 @@ public class SortDialogFragment extends DialogFragment {
                         {
                             MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
                         }
-
+                        onSortSelectListener activity = (onSortSelectListener) getActivity();
+                        activity.DoneSort(); //make sure you add the same parameters as you did above
                     }
-                })
-
-            // Set the action buttons
-            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    // user clicked OK, so save the mSelectedItems results somewhere
-                    // or return them to the component that opened the dialog
-                    onSortSelectListener activity = (onSortSelectListener) getActivity();
-                    activity.DoneSort(); //make sure you add the same parameters as you did above
-                }
-            })
-
-            .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int id) {
-                    // removes the dialog from the screen
-                    MainActivity.sortOrder = tempSort;
-                    onSortSelectListener activity = (onSortSelectListener) getActivity();
-                    activity.DoneSort(); //make sure you add the same parameters as you did above
-                }
-            });
+                });
         return builder.create();
     }
 }
