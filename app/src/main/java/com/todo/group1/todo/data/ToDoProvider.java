@@ -67,74 +67,129 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
-    private Cursor getTasks(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
-        String [] selectionArgs = new String [] { "0" };
+    private Cursor getTasks(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String updatedSelection;
+        String [] updatedSelectionArgs;
+        if (selectionArgs != null) {
+            updatedSelection = selection + " AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String[] { selectionArgs[0], "0"};
+        }
+        else {
+            updatedSelection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String [] {"0"};
+        }
+
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                selection,
-                selectionArgs,
+                updatedSelection,
+                updatedSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getTasksWithPriority(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ? AND " +
-                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri), "0"};
+    private Cursor getTasksWithPriority(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+
+        String updatedSelection;
+        String [] updatedSelectionArgs;
+        if (selectionArgs != null) {
+            updatedSelection = selection + " AND " +
+                    ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String[] { selectionArgs[0], ToDoContract.TaskEntry.getPriorityIdFromUri(uri), "0"};
+        }
+        else {
+            updatedSelection = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " = ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String [] {ToDoContract.TaskEntry.getPriorityIdFromUri(uri), "0"};
+        }
+
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                selection,
-                selectionArgs,
+                updatedSelection,
+                updatedSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getTasksBeforeDate(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
-                ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri), "0"};
+    private Cursor getTasksBeforeDate(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String updatedSelection;
+        String [] updatedSelectionArgs;
+        if (selectionArgs != null) {
+            updatedSelection = selection + " AND " +
+                    ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String[] { selectionArgs[0], ToDoContract.TaskEntry.getDateFromUri(uri), "0"};
+        }
+        else {
+            updatedSelection = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " <= ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String [] {ToDoContract.TaskEntry.getDateFromUri(uri), "0"};
+        }
+
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                selection,
-                selectionArgs,
+                updatedSelection,
+                updatedSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getTasksWithLabel(Uri uri, String [] projection, String sortOrder) {
-        String selection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ?";
-        String [] selectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri)};
+    private Cursor getTasksWithLabel(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String updatedSelection;
+        String [] updatedSelectionArgs;
+        if (selectionArgs != null) {
+            updatedSelection = selection + " AND " +
+                    ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String[] { selectionArgs[0], ToDoContract.TaskEntry.getLabelIdFromUri(uri), "0"};
+        }
+        else {
+            updatedSelection = ToDoContract.TaskEntry.COLUMN_LABEL_ID + " = ? AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = ?";
+            updatedSelectionArgs = new String [] {ToDoContract.TaskEntry.getLabelIdFromUri(uri), "0"};
+        }
+
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                selection,
-                selectionArgs,
+                updatedSelection,
+                updatedSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getTasksMarkedComplete(Uri uri, String [] projection, String sortOrder) {
-        // 1 means the task is marked complete
-        String selection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
+    private Cursor getTasksMarkedComplete(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+        String updatedSelection;
+        String [] updatedSelectionArgs;
+        if (selectionArgs != null) {
+            updatedSelection = selection + " AND " +
+                    ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
+            updatedSelectionArgs = new String[] { selectionArgs[0]};
+        }
+        else {
+            updatedSelection = ToDoContract.TaskEntry.COLUMN_IS_COMPLETED + " = 1";
+            updatedSelectionArgs = new String [] {};
+        }
+
         return sTasksWithPriorityAndLabels.query(mOpenHelper.getReadableDatabase(),
                 TASK_COLUMNS,
-                selection,
-                null,
+                updatedSelection,
+                updatedSelectionArgs,
                 null,
                 null,
                 sortOrder
         );
     }
 
-    private Cursor getTaskWithId(Uri uri, String [] projection, String sortOrder) {
+    private Cursor getTaskWithId(Uri uri, String[] projection, String sortOrder) {
         String selection = ToDoContract.TaskEntry.TABLE_NAME + "." +
                 ToDoContract.TaskEntry._ID + " = ?";
         String [] selectionArgs = new String [] { ToDoContract.TaskEntry.getTaskIdFromUri(uri) };
@@ -215,27 +270,27 @@ public class ToDoProvider extends ContentProvider {
         switch(sUriMatcher.match(uri)) {
             case TASKS:
             {
-                retCursor = getTasks(uri, projection, sortOrder);
+                retCursor = getTasks(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case TASKS_WITH_PRIORITY:
             {
-                retCursor = getTasksWithPriority(uri, projection, sortOrder);
+                retCursor = getTasksWithPriority(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case TASKS_AFTER_DATE:
             {
-                retCursor = getTasksBeforeDate(uri, projection, sortOrder);
+                retCursor = getTasksBeforeDate(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case TASKS_WITH_LABEL:
             {
-                retCursor = getTasksWithLabel(uri, projection, sortOrder);
+                retCursor = getTasksWithLabel(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case TASKS_MARKED_COMPLETE:
             {
-                retCursor = getTasksMarkedComplete(uri, projection, sortOrder);
+                retCursor = getTasksMarkedComplete(uri, projection, selection, selectionArgs, sortOrder);
                 break;
             }
             case TASK_WITH_ID:

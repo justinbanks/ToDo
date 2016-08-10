@@ -9,8 +9,6 @@ import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.provider.ContactsContract;
-import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.DialogFragment;
@@ -32,6 +30,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.EditText;
+import android.widget.FilterQueryProvider;
 import android.widget.ListView;
 
 import com.todo.group1.todo.data.ToDoContract;
@@ -114,6 +113,22 @@ public class MainActivity extends AppCompatActivity
         input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
 
+        mTaskListAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String [] selArgs = new String [] { charSequence.toString() + "%" };
+                return getContentResolver().query(
+                        ToDoContract.TaskEntry.CONTENT_URI,
+                        null,
+                        ToDoContract.TaskEntry.COLUMN_TITLE + " LIKE ?",
+                        selArgs,
+                        null,
+                        null
+                );
+
+            }
+        });
+
         //updates list based on search bar
         input.addTextChangedListener(new TextWatcher() {
             @Override
@@ -182,7 +197,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setCompletedTasksList() {
         // Build the Uri
-        Uri uri = ToDoContract.TaskEntry.buildTaskMarkedComplete();
+        final Uri uri = ToDoContract.TaskEntry.buildTaskMarkedComplete();
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -195,6 +210,21 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the task list adapter
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        mTaskListAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String [] selArgs = new String [] { charSequence.toString() + "%" };
+                return getContentResolver().query(
+                        uri,
+                        null,
+                        ToDoContract.TaskEntry.COLUMN_TITLE + " LIKE ?",
+                        selArgs,
+                        null,
+                        null
+                );
+            }
+        });
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
@@ -210,7 +240,7 @@ public class MainActivity extends AppCompatActivity
         // get dates after tomorrow
         cal.add(Calendar.DAY_OF_MONTH, 1);
         Date date = cal.getTime();
-        Uri uri = ToDoContract.TaskEntry.buildTaskBeforeDate(date);
+        final Uri uri = ToDoContract.TaskEntry.buildTaskBeforeDate(date);
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -223,6 +253,21 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the task list adapter
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        mTaskListAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String [] selArgs = new String [] { charSequence.toString() + "%" };
+                return getContentResolver().query(
+                        uri,
+                        null,
+                        ToDoContract.TaskEntry.COLUMN_TITLE + " LIKE ?",
+                        selArgs,
+                        null,
+                        null
+                );
+            }
+        });
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
@@ -257,7 +302,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // Build the Uri
-        Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(priorityId);
+        final Uri uri = ToDoContract.TaskEntry.buildTaskWithPriority(priorityId);
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -274,6 +319,21 @@ public class MainActivity extends AppCompatActivity
         // Set up the task list adapter
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
 
+        mTaskListAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String [] selArgs = new String [] { charSequence.toString() + "%" };
+                return getContentResolver().query(
+                        uri,
+                        null,
+                        ToDoContract.TaskEntry.COLUMN_TITLE + " LIKE ?",
+                        selArgs,
+                        null,
+                        null
+                );
+            }
+        });
+
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
 
@@ -283,7 +343,7 @@ public class MainActivity extends AppCompatActivity
 
     private void setAllTasksList() {
         // Build the Uri
-        Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
+        final Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
 
         // Query the database
         Cursor taskCursor = this.getContentResolver().query(
@@ -296,6 +356,22 @@ public class MainActivity extends AppCompatActivity
 
         // Set up the task list adapter
         mTaskListAdapter = new TaskListAdapter(this, taskCursor, 0);
+
+        mTaskListAdapter.setFilterQueryProvider(new FilterQueryProvider() {
+            @Override
+            public Cursor runQuery(CharSequence charSequence) {
+                String [] selArgs = new String [] { charSequence.toString() + "%" };
+                return getContentResolver().query(
+                        uri,
+                        null,
+                        ToDoContract.TaskEntry.COLUMN_TITLE + " LIKE ?",
+                        selArgs,
+                        null,
+                        null
+                );
+
+            }
+        });
 
         // attach the task list adapter to the list view
         ListView listview = (ListView) findViewById(R.id.listview_tasklist);
@@ -374,8 +450,7 @@ public class MainActivity extends AppCompatActivity
      * Default sort order for list
      * @return returns sort type
      */
-    public String defaultSort()
-    {
+    public String defaultSort() {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);
         String which = sp.getString("sort_list", "");
 
