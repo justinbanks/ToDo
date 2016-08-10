@@ -24,6 +24,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -41,11 +42,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity
-        implements LoaderManager.LoaderCallbacks<Cursor>,
+        implements LoaderManager.LoaderCallbacks<Cursor>, SortDialogFragment.onSortSelectListener,
         NavigationView.OnNavigationItemSelectedListener {
 
     private static final int TASKLIST_LOADER = 0;
-   // private String defaultOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
+    // private String defaultOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
     public static String sortOrder;
     private TaskListAdapter mTaskListAdapter;
     EditText input;
@@ -113,6 +114,7 @@ public class MainActivity extends AppCompatActivity
         input = (EditText) findViewById(R.id.inputSearch);
         listview.setTextFilterEnabled(true);
 
+        //updates list based on search bar
         input.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence arg0, int i, int i1, int i2) {
@@ -133,12 +135,12 @@ public class MainActivity extends AppCompatActivity
 
         //hides soft keyboard when search is not focus
         input.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-                        @Override
-                       public void onFocusChange(View v, boolean hasFocus) {
-                            if (!hasFocus)
-                                hideKeyboard(v);
-                        }
-                    });
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus)
+                    hideKeyboard(v);
+            }
+        });
     }
 
     @Override
@@ -357,8 +359,21 @@ public class MainActivity extends AppCompatActivity
     public void openDialog(MenuItem item) {
         DialogFragment newFragment = SortDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), "dialog");
+        Log.d("test", "test worked");
     }
 
+    /**
+     * Restarts loader after sorting
+     */
+    public void DoneSort() { //make sure any parameters you have get added here
+        Log.d("Loader restart", "restarting loader!");
+        getSupportLoaderManager().restartLoader(0, null, this);
+    }
+
+    /**
+     * Default sort order for list
+     * @return returns sort type
+     */
     public String defaultSort()
     {
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this);

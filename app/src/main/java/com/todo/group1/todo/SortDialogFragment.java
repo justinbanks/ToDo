@@ -19,6 +19,10 @@ public class SortDialogFragment extends DialogFragment {
         return frag;
     }
 
+    public interface onSortSelectListener {
+        void DoneSort(); //add parameters if needed
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
@@ -31,33 +35,20 @@ public class SortDialogFragment extends DialogFragment {
                         {
                             Log.d("debug", "priority");
                             MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " ASC";
+                            //getLoaderManager().initLoader(0, null);
                         }
                         else if( which == 1)
                         {
-                            defaultSort(0);
+                            MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " ASC";
                         }
                         else if( which == 2)
                         {
-                            defaultSort(1);
+                            MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
                         }
+                        onSortSelectListener activity = (onSortSelectListener) getActivity();
+                        activity.DoneSort(); //make sure you add the same parameters as you did above
                     }
                 });
         return builder.create();
-    }
-
-    public String defaultSort(int which)
-    {
-
-        switch (which){
-            case 1:
-                return ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " ASC";
-            case 0:
-                return ToDoContract.TaskEntry.COLUMN_DUE_DATE + " ASC";
-            case -1:
-                return ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
-
-            default:
-                return ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
-        }
     }
 }
