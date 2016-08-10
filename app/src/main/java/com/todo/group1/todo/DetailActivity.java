@@ -332,7 +332,7 @@ public class DetailActivity extends AppCompatActivity {
          * @return A string containing the label ID, or null if the label does not exist.
          */
         public String getLabelId(String label) {
-            if (label.equals("")) return null;
+            if (label.equals("")) return "1";
 
             // We need to find out if that label already exists
             Cursor labelCursor = getActivity().getContentResolver().query(
