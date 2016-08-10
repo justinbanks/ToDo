@@ -11,10 +11,12 @@ import java.util.Date;
 
 import static org.junit.Assert.assertEquals;
 
+
 /**
  * Created by Justin Banks on 7/25/16.
  * This file contains test cases related to the ToDoProvider class.
  */
+
 public class TestProvider {
 
     private Context mContext = InstrumentationRegistry.getTargetContext();
@@ -259,74 +261,4 @@ public class TestProvider {
 
         TestUtilities.validateCursor("testPriorityByIdQuery", priorityCursor, testValues);
     }
-
-//    // This tests the insert functionality for our content provider
-//    @org.junit.Test
-//    public void testInsertReadProvider() {
-//        // Test the task insertion
-//        ContentValues testValues = TestUtilities.createTaskEntryValues();
-//
-//        TestUtilities.TestContentObserver tco = TestUtilities.getTestContentObserver();
-//        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskEntry.CONTENT_URI,
-//                true,
-//                tco);
-//        Uri taskUri = mContext.getContentResolver().insert(ToDoContract.TaskEntry.CONTENT_URI, testValues);
-//
-//        // verify content observer was called
-//        tco.waitForNotificationOrFail();
-//        mContext.getContentResolver().unregisterContentObserver(tco);
-//
-//        long taskRowId = ContentUris.parseId(taskUri);
-//
-//        // verify a row was returned
-//        assertTrue(taskRowId != -1);
-//
-//        // Verify that data was inserted by pulling it out and looking at it
-//        Cursor cursor = mContext.getContentResolver().query(
-//                ToDoContract.TaskEntry.CONTENT_URI,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//        TestUtilities.validateCursor("testInsertReadProvider. Error validating TaskEntry insert",
-//                cursor, testValues);
-//
-//        // Test the label insertion
-//        ContentValues labelValues = TestUtilities.createLabelValues();
-//        tco = TestUtilities.getTestContentObserver();
-//        mContext.getContentResolver().unregisterContentObserver(tco);
-//
-//        Cursor labelCursor = mContext.getContentResolver().query(
-//                ToDoContract.TaskLabel.CONTENT_URI,
-//                null,
-//                null,
-//                null,
-//                null
-//        );
-//
-//        TestUtilities.validateCursor("testInsertReadProvider. Error validating LabelEntry insert",
-//                labelCursor, labelValues);
-//    }
-//
-//    @org.junit.Test
-//    public void testDeleteRecords() {
-//        testInsertReadProvider();
-//
-//        // Register a content observer for our location delete.
-//        TestUtilities.TestContentObserver taskObserver = TestUtilities.getTestContentObserver();
-//        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskEntry.CONTENT_URI, true, taskObserver);
-//
-//        // Register a content observer for our weather delete.
-//        TestUtilities.TestContentObserver labelObserver = TestUtilities.getTestContentObserver();
-//        mContext.getContentResolver().registerContentObserver(ToDoContract.TaskLabel.CONTENT_URI, true, labelObserver);
-//
-//        deleteAllRecordsFromProvider();
-//
-//        taskObserver.waitForNotificationOrFail();
-//        labelObserver.waitForNotificationOrFail();
-//
-//        mContext.getContentResolver().unregisterContentObserver(taskObserver);
-//        mContext.getContentResolver().unregisterContentObserver(labelObserver);
-//    }
 }

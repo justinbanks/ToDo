@@ -335,7 +335,6 @@ public class ToDoProvider extends ContentProvider {
         switch (match) {
             case TASKS: {
                 long _id = db.insert(ToDoContract.TaskEntry.TABLE_NAME, null, contentValues);
-
                 if (_id > 0)
                     returnUri = ToDoContract.TaskEntry.buildTaskUri(_id);
                 else
