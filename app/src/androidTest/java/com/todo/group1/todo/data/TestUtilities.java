@@ -37,10 +37,11 @@ public class TestUtilities {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
-            String actualValue = valueCursor.getString(idx);
-            assertEquals("Value '" + entry.getValue().toString() +
-                    "' did not match the expected value '" +
-                    expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
+            if (!valueCursor.getString(idx).equals("")) {
+                assertEquals("Value '" + entry.getValue().toString() +
+                        "' did not match the expected value '" +
+                        expectedValue + "'. " + error, expectedValue, valueCursor.getString(idx));
+            }
         }
     }
 
@@ -56,7 +57,7 @@ public class TestUtilities {
         taskValues.put(ToDoContract.TaskEntry.COLUMN_CREATE_DATE, currentTime);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_DUE_DATE, currentTime);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_DETAIL, "this is important");
-        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 1);
+        taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_COMPLETED, 0);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_IS_DELETED, 0);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_LABEL_ID, 1);
         taskValues.put(ToDoContract.TaskEntry.COLUMN_PARENT_TASK_ID, -1);
