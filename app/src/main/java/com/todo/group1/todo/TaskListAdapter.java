@@ -11,11 +11,7 @@ import android.widget.TextView;
 import com.todo.group1.todo.data.ToDoContract;
 
 /**
- * Created by Justin Banks on 8/5/2016.
- */
-
-/**
- * {@link TaskListAdapter} exposes a list of weather forecasts
+ * {@link TaskListAdapter} exposes a list of tasks
  * from a {@link android.database.Cursor} to a {@link android.widget.ListView}.
  */
 public class TaskListAdapter extends CursorAdapter {
@@ -24,21 +20,33 @@ public class TaskListAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
+    /**
+     * Convert a cursor to String.
+     * @param cursor
+     * @return
+     */
     private String convertCursorRowToUXFormat(Cursor cursor) {
         int idx_title = cursor.getColumnIndex(ToDoContract.TaskEntry.COLUMN_TITLE);
         return cursor.getString(idx_title);
     }
 
-    /*
-        Remember that these views are reused as needed.
+    /**
+     * Create a new view, they are reused as needed.
+     * @param context
+     * @param cursor
+     * @param parent
+     * @return
      */
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return LayoutInflater.from(context).inflate(R.layout.list_item_task, parent, false);
     }
 
-    /*
-        This is where we fill-in the views with the contents of the cursor.
+    /**
+     * Fill in the views with the contents of the cursor.
+     * @param view
+     * @param context
+     * @param cursor
      */
     @Override
     public void bindView(View view, Context context, Cursor cursor) {

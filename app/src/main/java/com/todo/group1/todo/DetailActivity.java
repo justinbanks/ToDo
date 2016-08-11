@@ -39,8 +39,15 @@ import java.util.Map;
 
 import static com.todo.group1.todo.data.ToDoContract.TaskEntry.COLUMN_TITLE;
 
+/**
+ * Inspect and edit a task.
+ */
 public class DetailActivity extends AppCompatActivity {
 
+    /**
+     * Operations to be run when the activity is created.
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -66,7 +73,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     /**
-     *
+     * Actions to be completed when a menu item is selected.
      * @param item
      * @return
      */
@@ -82,6 +89,9 @@ public class DetailActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * The fragement for the DetailActivity.
+     */
     public static class DetailFragment extends Fragment
             implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -139,6 +149,11 @@ public class DetailActivity extends AppCompatActivity {
             menuItemComplete = menu.findItem(R.id.action_complete);
         }
 
+        /**
+         * Determine what to do if a menu item has been selected.
+         * @param item
+         * @return
+         */
         @Override
         public boolean onOptionsItemSelected(MenuItem item) {
             switch (item.getItemId()) {

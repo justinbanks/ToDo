@@ -8,7 +8,6 @@ import android.provider.BaseColumns;
 import java.util.Date;
 
 /**
- * Created by Justin Banks on 7/23/16.
  * Defines table and column names for the to do database
  */
 public class ToDoContract {
@@ -24,7 +23,9 @@ public class ToDoContract {
     public static final String PATH_PRIORITY = "priority";
     public static final String PATH_LABEL = "label";
 
-    // This class defines the contents of the task table
+    /**
+     * Define the structure of the task table.
+     */
     public static final class TaskEntry implements BaseColumns {
 
         // Set up the TaskEntry URI
@@ -108,7 +109,9 @@ public class ToDoContract {
         }
     }
 
-    // This class defines the contents of the priority table
+    /**
+     * Define the contents of the Priority table and populate it.
+     */
     public static final class TaskPriority implements BaseColumns {
 
         // Set up the Priority URI
@@ -140,7 +143,9 @@ public class ToDoContract {
 
     }
 
-    // This class defines the contents of the label table
+    /**
+     * Define the contents of the label table.
+     */
     public static final class TaskLabel implements BaseColumns {
 
         // Set up the Label Uri

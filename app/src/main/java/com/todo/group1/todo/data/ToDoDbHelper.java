@@ -28,6 +28,10 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
         mContext = context;
     }
 
+    /**
+     * Create a new dataase. This creates all tables and inserts values when needed.
+     * @param sqLiteDatabase the database to be created. Passed by the system.
+     */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
@@ -94,7 +98,12 @@ public class ToDoDbHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(SQL_CREATE_TASK_TABLE);
     }
 
-    // this function to be implemented if DATABASE_VERSION is incremented (i.e. if schema changes)
+    /**
+     * This function is ran if the DATABASE_VERSION has changed (if the schema changes.)
+     * @param sqLiteDatabase the database.
+     * @param i the new schema.
+     * @param i1 passed by the system.
+     */
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
         onCreate(sqLiteDatabase);

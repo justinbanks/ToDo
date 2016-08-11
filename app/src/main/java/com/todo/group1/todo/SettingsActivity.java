@@ -13,15 +13,13 @@ import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.ActionBar;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
+import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.text.TextUtils;
 import android.view.MenuItem;
-import android.support.v4.app.NavUtils;
-
-import java.util.List;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -161,12 +159,6 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     /**
      * {@inheritDoc}
      */
-
-    //@Override
-    //@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    //public void onBuildHeaders(List<Header> target) {
-        //loadHeadersFromResource(R.xml.pref_headers, target);
-    //}
 
     /**
      * This method stops fragment injection in malicious applications.

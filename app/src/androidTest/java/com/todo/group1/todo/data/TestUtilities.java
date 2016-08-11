@@ -37,8 +37,8 @@ public class TestUtilities {
             int idx = valueCursor.getColumnIndex(columnName);
             assertFalse("Column '" + columnName + "' not found. " + error, idx == -1);
             String expectedValue = entry.getValue().toString();
-            String actualValue = valueCursor.getString(idx);
-            if (!valueCursor.getString(idx).equals("") &&
+            if (valueCursor.getString(idx) != null &&
+                    !valueCursor.getString(idx).equals("") &&
                     !columnName.equals(ToDoContract.TaskEntry.COLUMN_CREATE_DATE) &&
                     !columnName.equals(ToDoContract.TaskEntry.COLUMN_DUE_DATE)) {
                 assertEquals("Value '" + valueCursor.getString(idx) +

@@ -4,11 +4,10 @@ import java.io.Serializable;
 import java.util.Calendar;
 
 /**
- * Created by Justin Banks on 8/1/16.
- * This class implements a ToDoItem
+ * This class implements a ToDoItem. It implements Serializable in order to pass the class
+ * between activities via an Intent.
  */
 
-// Serializable is implemented here in order to pass the class between activities
 public class ToDoItem implements Serializable{
 
     public String toDoTitle = "";

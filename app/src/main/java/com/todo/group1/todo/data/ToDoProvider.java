@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 /**
- * Created by Justin Banks on 7/24/16.
  * This class provides the content provider for the To Do application.
  */
 
@@ -67,6 +66,15 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return all incomplete tasks
+     * @param uri the uri passed by the caller.
+     * @param projection the columns to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the SQLite query.
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTasks(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String updatedSelection;
         String [] updatedSelectionArgs;
@@ -90,6 +98,15 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return all tasks with the priority provided in the uri.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the WHERE clause (they replace the question marks).
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTasksWithPriority(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
 
         String updatedSelection;
@@ -116,6 +133,15 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return all tasks before the date provided in the Uri.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the WHERE clause (they replace the question marks).
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTasksBeforeDate(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String updatedSelection;
         String [] updatedSelectionArgs;
@@ -141,6 +167,15 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return all tasks with the label id given in the Uri.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the WHERE clause (they replace the question marks).
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTasksWithLabel(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String updatedSelection;
         String [] updatedSelectionArgs;
@@ -166,6 +201,15 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return all tasks marked complete.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the WHERE clause (they replace the question marks).
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTasksMarkedComplete(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         String updatedSelection;
         String [] updatedSelectionArgs;
@@ -189,6 +233,13 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Return the task with the id given in the Uri.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     private Cursor getTaskWithId(Uri uri, String[] projection, String sortOrder) {
         String selection = ToDoContract.TaskEntry.TABLE_NAME + "." +
                 ToDoContract.TaskEntry._ID + " = ?";
@@ -203,6 +254,10 @@ public class ToDoProvider extends ContentProvider {
         );
     }
 
+    /**
+     * Set up the Uri matcher.
+     * @return
+     */
     static UriMatcher buildUriMatcher() {
         //The code passed into the constructor represents the code to return for the root URI
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -226,12 +281,21 @@ public class ToDoProvider extends ContentProvider {
         return matcher;
     }
 
+    /**
+     * Create the databse helper.
+     * @return true to verify the function has completed.
+     */
     @Override
     public boolean onCreate() {
         mOpenHelper = new ToDoDbHelper(getContext());
         return true;
     }
 
+    /**
+     * Get the type returned for a given uri.
+     * @param uri the uri whose type is to be determined.
+     * @return the type of the uri.
+     */
     @Override
     public String getType(@NonNull Uri uri) {
         final int match = sUriMatcher.match(uri);
@@ -263,6 +327,15 @@ public class ToDoProvider extends ContentProvider {
         }
     }
 
+    /**
+     * Determine which query to make based on the uri, and make the query.
+     * @param uri the uri passed by the caller, contains the priority id.
+     * @param projection the columnst to be returned.
+     * @param selection the WHERE clause for the SQLite query.
+     * @param selectionArgs the arguments for the WHERE clause (they replace the question marks).
+     * @param sortOrder the order by value for the SQLite query.
+     * @return a cursor containing the tasks.
+     */
     @Nullable
     @Override
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
@@ -378,7 +451,12 @@ public class ToDoProvider extends ContentProvider {
 
     }
 
-    // insert a record into the database
+    /**
+     * Insert a record into the database.
+     * @param uri the uri that defines which table is to be inserted.
+     * @param contentValues the values to be inserted.
+     * @return the id of the item inserted.
+     */
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri, ContentValues contentValues) {
@@ -412,6 +490,13 @@ public class ToDoProvider extends ContentProvider {
         return returnUri;
     }
 
+    /**
+     * Delete a value from the database.
+     * @param uri the uri that defines which table will be deleted from.
+     * @param selection the WHERE clause for the delete query.
+     * @param selectionArgs the arguments for the where clause.
+     * @return the number of rows deleted.
+     */
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
@@ -437,6 +522,14 @@ public class ToDoProvider extends ContentProvider {
         }
         return rowsDeleted;    }
 
+    /**
+     * Update a row in the database.
+     * @param uri the uri that defines which table will be updated.
+     * @param values the values that will replace the old values.
+     * @param selection the WHERE clause of the update.
+     * @param selectionArgs the arguments to the WHERE clause.
+     * @return the number of rows updated.
+     */
     @Override
     public int update(
             @NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {

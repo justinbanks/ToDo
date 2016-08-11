@@ -2,16 +2,16 @@ package com.todo.group1.todo;
 
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 
 import com.todo.group1.todo.data.ToDoContract;
 
-//Dialog Fragment class to build sort Dialog
+/**
+ * DialogFragment that allows the user to select a sorting method.
+ */
 public class SortDialogFragment extends DialogFragment {
 
     public static SortDialogFragment newInstance() {

@@ -40,6 +40,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The main class of the application.
+ */
 public class MainActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<Cursor>, SortDialogFragment.onSortSelectListener,
         NavigationView.OnNavigationItemSelectedListener {
@@ -50,6 +53,10 @@ public class MainActivity extends AppCompatActivity
     private TaskListAdapter mTaskListAdapter;
     EditText input;
 
+    /**
+     * Set up the activity.
+     * @param savedInstanceState
+     */
     @Override
     @SuppressWarnings("ConstantConditions")
     protected void onCreate(Bundle savedInstanceState) {
@@ -158,6 +165,9 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+    /**
+     * Close the drawer if the back button is pressed.
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -169,10 +179,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     *
-     * Loader Functions
-     *
-     *
+     * Create the loader.
+     * @param i system parameter.
+     * @param bundle system parameter.
+     * @return
      */
     @Override
     public Loader<Cursor> onCreateLoader (int i, Bundle bundle) {
@@ -185,16 +195,28 @@ public class MainActivity extends AppCompatActivity
         );
     }
 
+    /**
+     * Operations to run when the loader has completed loading.
+     * @param cursorLoader
+     * @param cursor
+     */
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mTaskListAdapter.swapCursor(cursor);
     }
 
+    /**
+     * Operations to run when the loader is reset.
+     * @param cursorLoader
+     */
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mTaskListAdapter.swapCursor(null);
     }
 
+    /**
+     * Filter the task list to all completed tasks.
+     */
     private void setCompletedTasksList() {
         // Build the Uri
         final Uri uri = ToDoContract.TaskEntry.buildTaskMarkedComplete();
@@ -233,6 +255,9 @@ public class MainActivity extends AppCompatActivity
         listview.setAdapter(mTaskListAdapter);
     }
 
+    /**
+     * Filter the task list to all upcoming incomplete tasks.
+     */
     private void setUpcomingTasksList() {
         // Build the Uri
         // generate a date
@@ -276,6 +301,9 @@ public class MainActivity extends AppCompatActivity
         listview.setAdapter(mTaskListAdapter);
     }
 
+    /**
+     * Filter the task list to all incomplete high priority tasks.
+     */
     private void setHighPriorityTasksList() {
         Cursor priorityCursor = this.getContentResolver().query(
                 ToDoContract.TaskPriority.CONTENT_URI,
@@ -341,6 +369,9 @@ public class MainActivity extends AppCompatActivity
         listview.setAdapter(mTaskListAdapter);
     }
 
+    /**
+     * Filter the task list to all tasks except complete.
+     */
     private void setAllTasksList() {
         // Build the Uri
         final Uri uri = ToDoContract.TaskEntry.CONTENT_URI;
@@ -380,6 +411,12 @@ public class MainActivity extends AppCompatActivity
         listview.setAdapter(mTaskListAdapter);
     }
 
+
+    /**
+     * Determine what to do when an item is selected in the navigation bar.
+     * @param item the menu item that was selected.
+     * @return true to verify that the function completed.
+     */
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -403,6 +440,11 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Inflate the main options menu.
+     * @param menu the menu to be inflated.
+     * @return the super classes onCreateOptionsMenu.
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu items for use in the action bar
@@ -411,13 +453,19 @@ public class MainActivity extends AppCompatActivity
         return super.onCreateOptionsMenu(menu);
     }
 
-    //hides soft keyboard
+    /**
+     * Hide the soft keyboard.
+     * @param view the view whose keyboard will be hidden.
+     */
     public void hideKeyboard(View view) {
         InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
         inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
-    //hides or shows the search bar when search icon is clicked
+    /**
+     * Hide or show the search when the search icon is clicked.
+     * @param item the icon that was clicked.
+     */
     public void hideSearch(MenuItem item) {
 
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -431,7 +479,10 @@ public class MainActivity extends AppCompatActivity
             input.setVisibility(View.GONE);
     }
 
-    //function to open the sort Dialog onClick of the sort button
+    /**
+     * Open the sort dialog when the sort button is clicked.
+     * @param item
+     */
     public void openDialog(MenuItem item) {
         DialogFragment newFragment = SortDialogFragment.newInstance();
         newFragment.show(getSupportFragmentManager(), "dialog");
@@ -439,7 +490,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Restarts loader after sorting
+     * Restarts loader after sorting.
      */
     public void DoneSort() { //make sure any parameters you have get added here
         Log.d("Loader restart", "restarting loader!");
@@ -447,7 +498,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Default sort order for list
+     * Default sort order for list.
      * @return returns sort type
      */
     public String defaultSort() {
