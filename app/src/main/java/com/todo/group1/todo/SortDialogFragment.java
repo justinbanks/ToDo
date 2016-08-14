@@ -25,26 +25,46 @@ public class SortDialogFragment extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final String tempSort = MainActivity.sortOrder;
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(R.string.toolbar_sort_title)
-                .setItems(R.array.pref_sort_list_titles, new DialogInterface.OnClickListener() {
+                .setSingleChoiceItems(R.array.pref_sort_list_titles, 3, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         // The 'which' argument contains the index position
                         // of the selected item
-                        if( which == 0)
-                        {
-                            Log.d("debug", "priority");
+
+                    }
+                })
+
+                // Set the action buttons
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // user clicked OK, so save the mSelectedItems results somewhere
+                        // or return them to the component that opened the dialog
+                        int selectedPosition = ((AlertDialog)dialog).getListView().getCheckedItemPosition();
+                        if(selectedPosition == 0) {
                             MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_PRIORITY_ID + " ASC";
-                            //getLoaderManager().initLoader(0, null);
+                            //Log.d("checked pos", "priority checked");
                         }
-                        else if( which == 1)
-                        {
+                        else if(selectedPosition == 1) {
                             MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_DUE_DATE + " ASC";
+                            //Log.d("checked pos", "time checked");
                         }
-                        else if( which == 2)
-                        {
+                        else if(selectedPosition == 2) {
                             MainActivity.sortOrder = ToDoContract.TaskEntry.COLUMN_TITLE + " ASC";
+                            //Log.d("checked pos", "alph checked");
                         }
+                        onSortSelectListener activity = (onSortSelectListener) getActivity();
+                        activity.DoneSort(); //make sure you add the same parameters as you did above
+                    }
+                })
+
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+                        // removes the dialog from the screen
+                        MainActivity.sortOrder = tempSort;
                         onSortSelectListener activity = (onSortSelectListener) getActivity();
                         activity.DoneSort(); //make sure you add the same parameters as you did above
                     }
